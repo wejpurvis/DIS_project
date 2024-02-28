@@ -10,7 +10,29 @@ except ImportError:
 
 
 class Record:
+    """
+    Stores information in a cel file.
+
+    Attributes:
+        NumberCells (int): The number of cells.
+        intensities (list): The intensities of the cells.
+        stdevs (list): The standard deviations of the cells.
+        pixels (list): The pixel values of the cells.
+        nrows (int): The number of rows in the record.
+        ncols (int): The number of columns in the record.
+        nmask (int): The number of masked cells.
+        mask (list): The masked cells.
+        noutliers (int): The number of outlier cells.
+        outliers (list): The outlier cells.
+        modified (bool): Indicates if the record has been modified.
+        nmodified (int): The number of modified cells.
+        raw_content (list): The raw content of the .cel file.
+    """
+
     def __init__(self):
+        """
+        Initializes the attributes of the class.
+        """
         self.NumberCells = None
         self.intensities = None
         self.stdevs = None
@@ -23,15 +45,54 @@ class Record:
         self.outliers = None
         self.modified = None
         self.nmodified = None
+        self.raw_content = []
+
+    def __str__(self):
+        """
+        Returns a string representation of the class.
+
+        Returns
+        -------
+        str
+            A string representation of the class.
+        """
+        return "".join(line.decode("utf-8") for line in self.raw_content)
 
 
 def parse_cel_file(file_path):
+    """
+    Parses a .cel file and populates a Record instance with its content.
 
+    Parameters
+    ----------
+    file_path : str
+                The path to the .cel file to be parsed.
+
+    Returns
+    -------
+    Record : object
+        An instance of the Record class populated with the .cel file's data.
+
+    Raises
+    ------
+    ValueError
+        If the number of cells does not match the expected number based on nrows and ncols.
+    ImportError
+        If numpy is not installed.
+
+    Examples
+    --------
+    >>> record = parse_cel_file("path/to/file.cel")
+    >>> print(record.ncols) # prints the number of columns in the record
+    >>> print(record.nrows) # prints the number of rows in the record
+    >>> print(record.intensities) # prints the intensities of the cells
+    """
     record = Record()
 
     # open the .cel file
     with open(file_path, "rb") as f:
         content = f.readlines()
+        record.raw_content = content
 
     # extract data
     section = None
