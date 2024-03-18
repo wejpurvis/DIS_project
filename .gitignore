@@ -1,2 +1,5 @@
 # Ignore all pycache
 **/__pycache__/
+
+# Don't upload data
+data/
