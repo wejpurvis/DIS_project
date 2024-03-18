@@ -32,28 +32,29 @@ class JAXP53_Data:
 
         # handle variance and data based on 'replicate' number
         if replicate is None:
+            # self.m_observed = jnp.array(self.m_observed)
             self._data = [
                 (self.t_observed, self.m_observed[r, i])
                 for r in range(actual_m_observed.shape[0])
                 for i in range(self._num_outputs)
             ]
-        else:
-            self._data = [
-                (self.t_observed, self.m_observed[replicate, i])
-                for i in range(self._num_outputs)
-            ]
-
-        self.variance = (
-            jnp.array([gene_var[replicate, i] for i in range(self._num_outputs)])
-            if replicate is not None
-            else jnp.array(
+            self.variance = jnp.array(
                 [
                     gene_var[r, i]
                     for r in range(actual_m_observed.shape[0])
                     for i in range(self._num_outputs)
                 ]
             )
-        )
+        else:
+            self.m_observed = self.m_observed[replicate : replicate + 1]
+            self.f_observed = self.f_observed[0:1]
+            self._data = [
+                (self.t_observed, self.m_observed[0, i])
+                for i in range(self._num_outputs)
+            ]
+            self.variance = jnp.array(
+                [gene_var[replicate, i] for i in range(self._num_outputs)]
+            )
 
     def __getitem__(self, index):
         if index < 0 or index >= len(self._data):
