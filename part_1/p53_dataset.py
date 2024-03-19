@@ -179,7 +179,7 @@ def flatten_dataset_jax(dataset):
         train_y: The flattened observed values across genes.
     """
     num_genes = dataset.num_outputs
-    train_t, _ = dataset[0]
+    train_t = dataset[0][0]
     num_times = train_t.shape[0]
 
     # Collect all observed values across genes, now using JAX operations
@@ -187,8 +187,8 @@ def flatten_dataset_jax(dataset):
         num_genes, num_times
     )
 
-    # Repeat 'train_t' for each gene
-    train_t = jnp.repeat(train_t, num_genes)
+    # Repeat 'train_t' for each gene (tile is eqv to repeat in pytorch)
+    train_t = jnp.tile(train_t, num_genes)
 
     # Flatten 'm_observed' to match the repeated 'train_t'
     train_y = m_observed.reshape(-1)
