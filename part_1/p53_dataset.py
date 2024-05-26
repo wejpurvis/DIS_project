@@ -13,9 +13,10 @@ class JAXP53_Data:
     """
 
     def __init__(self, replicate=None, data_dir="../data/"):
+        replicate -= 1
         m_observed, f_observed, gene_var, tf_var, t = load_barenco_data(data_dir)
 
-        # m_observed is a tuple containing a data frame of gene expression levels and log-normalised gene expression levels (size: (replicares, genes, times))
+        # m_observed is a tuple containing a data frame of gene expression levels and log-normalised gene expression levels (size: (replicates, genes, times))
         m_df, actual_m_observed = m_observed
 
         self.gene_names = np.array(m_df.index)
