@@ -308,7 +308,10 @@ def dataset_3d(data):
     # Shape (t x j x r) x 1 where t is timepoints and j is genes and r is replicates
     gene_expressions = gene_data[:, 1, :].flatten().reshape(-1, 1)
 
-    return training_times, gene_expressions
+    # Shape (t x j x r) x 1 where t is timepoints and j is genes and r is replicates
+    variances = data.gene_variances.flatten().reshape(-1, 1)
+
+    return training_times, gene_expressions, variances
 
 
 def generate_test_times(t=100):
