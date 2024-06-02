@@ -151,6 +151,15 @@ def load_barenco_data(dir_path):
         - p53_variances: array of shape (3, 1, 7) containing p53 expression variances
     """
 
+    expression_path = os.path.join(dir_path, "barencoPUMA_exprs.csv")
+    variance_path = os.path.join(dir_path, "barencoPUMA_se.csv")
+
+    # Check if files exist
+    if not os.path.exists(expression_path):
+        raise FileNotFoundError(f"File not found: {expression_path}")
+    if not os.path.exists(variance_path):
+        raise FileNotFoundError(f"File not found: {variance_path}")
+
     # Load data from .csv files
     with open(os.path.join(dir_path, "barencoPUMA_exprs.csv"), "r") as f:
         gene_expressions = pd.read_csv(f, index_col=0)
@@ -314,14 +323,14 @@ def dataset_3d(data):
     return training_times, gene_expressions, variances
 
 
-def generate_test_times(t=100):
+def generate_test_times(t=80):
     """
     Generate testing times for the GP model to predict the latent force function.
 
     Parameters
     ----------
     t : int, optional
-        Number of testing times. Default is 100.
+        Number of testing times. Default is 80.
 
     Returns
     -------
@@ -329,7 +338,7 @@ def generate_test_times(t=100):
         Array of testing times of shape (t, 3) where t is the number of testing times.
     """
 
-    times = jnp.linspace(0, 12, t)
+    times = jnp.linspace(0, 13, t)
     # Gene indices shouldn't matter
     gene_indices = jnp.repeat(-1, t)
     testing_times = jnp.stack((times, gene_indices, jnp.repeat(0, t)), axis=-1)
