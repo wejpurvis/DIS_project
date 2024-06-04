@@ -3,3 +3,6 @@
 
 # Don't upload data
 data/
+
+# Ignore all .npy files
+**/*.npy
