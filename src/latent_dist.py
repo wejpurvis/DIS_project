@@ -1,14 +1,15 @@
 """
-Python implementation of work carried out in Jupyter notebooks in order to use pytest
+Script to run GPR for the prediction of the latent function.
 """
 
 # Importing libraries
-import pytest
 import jax
 import gpjax as gpx
 import jax.numpy as jnp
 from p53_data import JAXP53_Data, dataset_3d, generate_test_times
 from kernels import latent_kernel
+from custom_gps import p53_posterior
+from plotter import plot_gp
 import optax as ox
 import jax.random as jr
 
@@ -18,7 +19,7 @@ key = jr.PRNGKey(42)
 
 # Function definitions
 def initialise_gp(kernel, mean, dataset):
-    prior = gpx.gps.Prior(mean_function=mean, kernel=kernel)
+    prior = gpx.gps.Prior(mean_function=mean, kernel=kernel, jitter=1e-4)
     likelihood = gpx.likelihoods.Gaussian(
         num_datapoints=dataset.n, obs_stddev=jnp.array([1.0e-3], dtype=jnp.float64)
     )
@@ -26,19 +27,15 @@ def initialise_gp(kernel, mean, dataset):
     return posterior
 
 
-def optimise_mll2(posterior, dataset, NIters=1000, key=key):
+def optimise_mll(posterior, dataset, NIters=1000, key=key):
     # define the MLL using dataset_train
     objective = gpx.objectives.ConjugateMLL(negative=True)
     print(f"MLL before opt: {objective(posterior, dataset):.3f}")
     # Optimise to minimise the MLL
-    opt_posterior, history = gpx.fit(
+    opt_posterior, history = gpx.fit_scipy(
         model=posterior,
         objective=objective,
         train_data=dataset,
-        optim=ox.adam(1e-1),
-        num_iters=NIters,
-        key=key,
-        safe=False,
     )
     return opt_posterior, history
 
@@ -55,17 +52,21 @@ if __name__ == "__main__":
     meanf = gpx.mean_functions.Zero()
     p53_ker = latent_kernel()
 
-    p53_ker.true_s
-
     # Obtain posterior distribution
     posterior = initialise_gp(p53_ker, meanf, dataset_train)
 
     # Optimisise MLL for GPR to obtain optimised posterior
-    opt_posterior, history = optimise_mll2(posterior, dataset_train)
+    opt_post, history = optimise_mll(posterior, dataset_train)
 
-    # Predict latent function
-    latent_dist = opt_posterior.predict(testing_times, train_data=dataset_train)
-    predictive_dist = opt_posterior.likelihood(latent_dist)
+    # Predict latent function using custom posterior and prediction method
+    p53_post = p53_posterior(prior=opt_post.prior, likelihood=opt_post.likelihood)
+    latent_dist = p53_post.latent_predict(testing_times, p53_data)
+
+    predictive_dist = p53_post.likelihood(latent_dist)
 
     predictive_mean = predictive_dist.mean()
     predictive_std = predictive_dist.stddev()
+
+    # Plot the GP
+    f = p53_data.f_observed.squeeze()
+    plot_gp(testing_times, predictive_dist, y_scatter=f)
