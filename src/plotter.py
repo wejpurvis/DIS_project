@@ -22,7 +22,7 @@ colors = rcParams["axes.prop_cycle"].by_key()["color"]
 # TODO: Add more plotting functions, edit docstrings
 
 
-def plot_gp(x_test, predictive_dist, y_scatter=None):
+def plot_gp(x_test, predictive_dist, stddev=2, y_scatter=None):
     """
     Plot LF GP given test points and prediction
 
@@ -30,6 +30,7 @@ def plot_gp(x_test, predictive_dist, y_scatter=None):
     ----------
     x_test: array of shape (n, 3)
     predictive_dist:  jax mvn
+    stddev: int
     y_scatter: array of shape (n,)
     """
 
@@ -44,22 +45,22 @@ def plot_gp(x_test, predictive_dist, y_scatter=None):
 
     ax.fill_between(
         x_test.squeeze(),
-        predictive_mean - 2 * predictive_std,
-        predictive_mean + 2 * predictive_std,
+        predictive_mean - stddev * predictive_std,
+        predictive_mean + stddev * predictive_std,
         alpha=0.2,
-        label="Two sigma",
+        label=f"{stddev} sigma",
         color=cols[1],
     )
     ax.plot(
         x_test,
-        predictive_mean - 2 * predictive_std,
+        predictive_mean - stddev * predictive_std,
         linestyle="--",
         linewidth=1,
         color=cols[1],
     )
     ax.plot(
         x_test,
-        predictive_mean + 2 * predictive_std,
+        predictive_mean + stddev * predictive_std,
         linestyle="--",
         linewidth=1,
         color=cols[1],
