@@ -33,9 +33,8 @@ def plot_gp(x_test, predictive_dist, stddev=2, y_scatter=None):
     stddev: int
     y_scatter: array of shape (n,)
     """
-
     predictive_mean = predictive_dist.mean()
-    predictive_std = predictive_dist.variance()
+    predictive_std = predictive_dist.stddev()
 
     # (100,)
     x_test = x_test[:, 0]
