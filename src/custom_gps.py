@@ -13,6 +13,8 @@ from gpjax.typing import (
     Array,
 )
 
+from jaxtyping import Int
+
 
 class p53_posterior(gpx.gps.ConjugatePosterior):
 
@@ -38,8 +40,8 @@ class p53_posterior(gpx.gps.ConjugatePosterior):
         x, y, variances = dataset_3d(train_data)
         t = test_inputs
 
-        # mean_x = self.prior.mean_function(x)
-        # mean_t = self.prior.mean_function(t)
+        mean_x = self.prior.mean_function(x)
+        mean_t = self.prior.mean_function(t)
 
         diag_variances = jnp.diag(variances.reshape(-1))
 
@@ -56,6 +58,8 @@ class p53_posterior(gpx.gps.ConjugatePosterior):
 
         # Kfx (Kxx + Io²)⁻¹ (y)
         mean = jnp.matmul(Sigma_inv_Kxt.T, y)
+        print(f"y shape: {y.shape}, Sigma_inv_Kxt shape: {Sigma_inv_Kxt.shape}")
+        print(f" mean x shape: {mean_x.shape}, mean t shape: {mean_t.shape}")
         # mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mean_x)
 
         covariance = Kff - jnp.matmul(Kxf.T, Sigma_inv_Kxt)
@@ -72,7 +76,7 @@ class p53_posterior(gpx.gps.ConjugatePosterior):
         """
         Predicts the gene expression values at test inputs given the training data.
         TODO: make this more jax-like and ensure means are calculated correctly
-
+        TODO: multivariate output (?)
         """
 
         # x = training_times, y = gene expressions
@@ -121,8 +125,11 @@ class p53_posterior(gpx.gps.ConjugatePosterior):
         mvn = tfd.MultivariateNormalFullCovariance(mean, var)
         return mvn, t_tiled
 
-    def predict_gene1(
-        self, test_inputs: Num[Array, "N D"], train_data: JAXP53_Data
+    def predict_gene_expression(
+        self,
+        test_inputs: Num[Array, "N D"],
+        gene: Int[Array, " O"],
+        train_data: JAXP53_Data,
     ) -> GaussianDistribution:
         # Predict gene expression for 1st gene
 
@@ -131,15 +138,13 @@ class p53_posterior(gpx.gps.ConjugatePosterior):
 
         t = test_inputs
 
-        # Slice traning data for 1st gene
-        x = x[:7]
-        y = y[:7]
-        variances = variances[:7]
+        # Slice traning data for given gene
+        start_slice = (gene - 1) * 7
+        end_slice = start_slice + 7
 
-        mean_x = self.prior.mean_function(x)
-        mean_t = self.prior.mean_function(t)
-
-        print(f" mean x shape: {mean_x.shape}, mean t shape: {mean_t.shape}")
+        x = x[start_slice:end_slice]
+        y = y[start_slice:end_slice]
+        variances = variances[start_slice:end_slice]
 
         diag_variances = jnp.diag(variances.reshape(-1))
 
@@ -150,18 +155,16 @@ class p53_posterior(gpx.gps.ConjugatePosterior):
         Sigma += cola.ops.I_like(Sigma) * self.prior.jitter  # + 1e-4
         Sigma = cola.PSD(Sigma)
 
-        Kff = self.prior.kernel.gram(t)
-        Kxf = self.prior.kernel.cross_covariance(x, t)
-        Sigma_inv_Kxt = cola.solve(Sigma, Kxf)
+        Ktt = self.prior.kernel.gram(t)
+        Kxt = self.prior.kernel.cross_covariance(x, t)
+        Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
 
         # Kfx (Kxx + Io²)⁻¹ (y)
-        # mean = jnp.matmul(Sigma_inv_Kxt.T, y)
-        print(f"y shape: {y.shape}, Sigma_inv_Kxt shape: {Sigma_inv_Kxt.shape}")
-        mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mean_x)
+        mean = jnp.matmul(Sigma_inv_Kxt.T, y)
 
-        var = Kff - jnp.matmul(Kxf.T, Sigma_inv_Kxt)
+        var = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
         var = jnp.diag(jnp.diag(var.to_dense()))
-        var += cola.ops.I_like(var) * self.prior.jitter
+        var += cola.ops.I_like(var) * 1e-3
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), var)
 
