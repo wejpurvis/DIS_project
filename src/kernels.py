@@ -49,14 +49,8 @@ class latent_kernel(gpx.kernels.AbstractKernel):
         trainable=True,
     )
 
-    # Sigmoid to map real numbers to (0,1) and then scales and shifts to get(0.5, 3.5) # NOTE: tfb.Chain acts Right to Left
-    l_bijector = tfb.Chain(
-        [
-            tfb.Shift(jnp.array(0.5, dtype=jnp.float64)),
-            tfb.Scale(jnp.array(3.0, dtype=jnp.float64)),
-            tfb.Sigmoid(),
-        ]
-    )
+    # Lengthscale constrained to be between 0.5 and 3.5
+    l_bijector = tfb.Sigmoid(low=0.5, high=3.5)
 
     initial_lengthscale = jnp.array(2.5, dtype=jnp.float64)
 
@@ -145,6 +139,7 @@ class latent_kernel(gpx.kernels.AbstractKernel):
         # Get gene indices
         j = t[1].astype(int)
         k = t_prime[1].astype(int)
+        # try jnp.array(X[...,[1]], dtype=int)
 
         t = t[0]
         t_prime = t_prime[0]
