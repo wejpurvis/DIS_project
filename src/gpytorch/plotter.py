@@ -12,7 +12,9 @@ from matplotlib import rcParams
 #     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
 # )
 
-plt.style.use("../../dissertation.mplstyle")
+relative_style_path = "../../dissertation.mplstyle"
+absolute_style_path = os.path.join(os.path.dirname(__file__), relative_style_path)
+plt.style.use(absolute_style_path)
 
 colors = rcParams["axes.prop_cycle"].by_key()["color"]
 
