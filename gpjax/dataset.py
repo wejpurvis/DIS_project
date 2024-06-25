@@ -140,6 +140,24 @@ class JaxP53Data:
         jnp_data = jnp.array(self.data)
         return jnp_data.shape
 
+    @staticmethod
+    def params_ground_truth():
+        """
+        Ground truth parameters for the SIMM model, measured experimentally by Barenco et al. (2006).
+
+        Returns
+        -------
+        tuple
+            Tuple containing the following arrays:
+            - B_exact: array of shape (5,) containing the basal expression levels
+            - S_exact: array of shape (5,) containing the sensitivities
+            - D_exact: array of shape (5,) containing the decay rates
+        """
+        B_exact = np.array([0.0649, 0.0069, 0.0181, 0.0033, 0.0869])
+        D_exact = np.array([0.2829, 0.3720, 0.3617, 0.8000, 0.3573])
+        S_exact = np.array([0.9075, 0.9748, 0.9785, 1.0000, 0.9680])
+        return B_exact, S_exact, D_exact
+
 
 def load_barenco_data(dir_path):
     """
