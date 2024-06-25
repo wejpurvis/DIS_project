@@ -19,36 +19,36 @@ CustomModel = tp.TypeVar("CustomModel", bound="ExactLFM")
 @dataclass
 class CustomConjMLL(gpx.objectives.AbstractObjective):
     def step(self, model: CustomModel, train_data: Dataset) -> ScalarFloat:
-        r"""Evaluate the marginal log-likelihood of the Gaussian process.
+        r"""
+        Evaluate the marginal log-likelihood of the Gaussian process.
 
         Compute the marginal log-likelihood function of the Gaussian process.
-        The returned function can then be used for gradient based optimisation
+        The returned function can then be used for gradient-based optimization
         of the model's parameters or for model comparison. The implementation
         given here enables exact estimation of the Gaussian process' latent
         function values.
 
-        For a training dataset $`\{x_n, y_n\}_{n=1}^N`$, set of test inputs
-        $`\mathbf{x}^{\star}`$ the corresponding latent function evaluations are given
-        by $`\mathbf{f}=f(\mathbf{x})`$ and $`\mathbf{f}^{\star}f(\mathbf{x}^{\star})`$,
-        the marginal log-likelihood is given by:
-        ```math
-        \begin{align}
-            \log p(\mathbf{y}) & = \int p(\mathbf{y}\mid\mathbf{f})p(\mathbf{f}, \mathbf{f}^{\star}\mathrm{d}\mathbf{f}^{\star}\\
-            &=0.5\left(-\mathbf{y}^{\top}\left(k(\mathbf{x}, \mathbf{x}') +\sigma^2\mathbf{I}_N  \right)^{-1}\mathbf{y}-\log\lvert k(\mathbf{x}, \mathbf{x}') + \sigma^2\mathbf{I}_N\rvert - n\log 2\pi \right).
-        \end{align}
-        ```
+        For a training dataset :math:`\{x_n, y_n\}_{n=1}^N`, set of test inputs
+        :math:`\mathbf{x}^{\star}` and the corresponding latent function evaluations are given
+        by :math:`\mathbf{f} = f(\mathbf{x})` and :math:`\mathbf{f}^{\star} = f(\mathbf{x}^{\star})`, the marginal log-likelihood is given by:
+
+        .. math::
+            \log p(\mathbf{y}) &= \int p(\mathbf{y} \mid \mathbf{f}) p(\mathbf{f}, \mathbf{f}^{\star}) \, \mathrm{d} \mathbf{f}^{\star} \\
+            &= 0.5 \left(-\mathbf{y}^{\top} \left(k(\mathbf{x}, \mathbf{x}') + \sigma^2 \mathbf{I}_N  \right)^{-1} \mathbf{y} - \log \lvert k(\mathbf{x}, \mathbf{x}') + \sigma^2 \mathbf{I}_N \rvert - n \log 2\pi \right)
 
         Our goal is to maximise the marginal log-likelihood. Therefore, when optimising the model's parameters with respect to the parameters, we use the negative marginal log-likelihood. This can be realised through
 
-        ```python
+        .. code-block:: python
+
             mll = gpx.objectives.ConjugateMLL(negative=True)
-        ```
 
         For optimal performance, the marginal log-likelihood should be ``jax.jit``
         compiled.
-        ```python
+
+        .. code-block:: python
+
             mll = jit(gpx.objectives.ConjugateMLL(negative=True))
-        ```
+
 
         Parameters
         ----------
