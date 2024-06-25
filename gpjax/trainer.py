@@ -130,7 +130,9 @@ class JaxTrainer:
         carry = model, opt_state
         return carry, loss_val
 
-    def after_epoch_jax(self, model: ModuleModel) -> ModuleModel:
+    def after_epoch_jax(
+        self, model: ModuleModel, fix_params: Optional[bool]
+    ) -> ModuleModel:
         """
         Adjusts model parameters after each epoch (fixed sensitivity and decay for the third data point)
 
@@ -138,20 +140,30 @@ class JaxTrainer:
         ----------
         model : ModuleModel
             The current model state.
+        fix_params : Optional[bool], optional
+            Flag to fix parameters after each epoch, by default True. (sensitivity of p21 to 1 and decay to 0.8)
 
         Returns
         -------
         ModuleModel
             The updated model.
         """
-        new_sensitivities = model.true_s.at[3].set(1.0)
-        new_decays = model.true_d.at[3].set(0.8)
+        if fix_params:
+            new_sensitivities = model.true_s.at[3].set(1.0)
+            new_decays = model.true_d.at[3].set(0.8)
+        else:
+            new_sensitivities = model.true_s
+            new_decays = model.true_d
 
         updated_model = model.replace(true_s=new_sensitivities, true_d=new_decays)
 
         return updated_model
 
-    def fit(self, num_steps_per_epoch: int) -> tuple:
+    def fit(
+        self,
+        fix_params: Optional[bool] = True,
+        num_steps_per_epoch: Optional[int] = 1000,
+    ) -> tuple:
         r"""Train a Module model with respect to a supplied Objective function for a given number of iterations. Optimisers used here should originate from Optax.
 
         Example:
@@ -172,8 +184,10 @@ class JaxTrainer:
 
         Parameters
         ----------
-        num_steps_per_epoch : int
-            The number of steps per epoch.
+        fix_params : Optional[bool], optional
+            Flag to fix parameters after each epoch, by default True. (sensitivity of p21 to 1 and decay to 0.8)
+        num_steps_per_epoch : Optional[int], optional
+            The number of steps per epoch, by default 1000.
 
         Returns
         -------
@@ -189,7 +203,7 @@ class JaxTrainer:
             model, opt_state = carry
             model = jax.lax.cond(
                 step_count % num_steps_per_epoch == 0,
-                lambda model: self.after_epoch_jax(model),
+                lambda model: self.after_epoch_jax(model, fix_params),
                 lambda model: model,
                 model,
             )
@@ -201,7 +215,11 @@ class JaxTrainer:
         )
 
         model = model.constrain()
-        self.model = self.after_epoch_jax(model)
+        if fix_params:
+            self.model = self.after_epoch_jax(model)
+        else:
+            self.model = model
+
         self.history = history
         if self.track_parameters:
             return self.model, self.history, self.track_parameters
