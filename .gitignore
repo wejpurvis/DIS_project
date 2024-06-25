@@ -9,3 +9,9 @@ data/
 
 # Ignore jupyter notebook in gpytorch dir
 gpytorch/*.ipynb
+
+# Ignore jupyter notebook in gpjaz dir
+gpjax/*.ipynb
+
+# Ignore 'sandbox' work
+latent_forces/
