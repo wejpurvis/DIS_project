@@ -6,6 +6,7 @@ import torch
 import gpytorch
 import numpy as np
 
+from gpytorch.constraints import Positive, Interval
 from dataset import PyTorchDataset
 
 PI = torch.tensor(np.pi, requires_grad=False)
