@@ -76,6 +76,8 @@ def plot_lf(gp, timepoints, stddev=2, scatter=None, save=True):
 
     if save:
         save_plot("gpytorch_lf.png")
+    else:
+        plt.show()
     plt.clf()
 
 
@@ -153,6 +155,8 @@ def plot_gxpred(gp, timepoints, dataset, stddev=2, scatter=None, save=True):
         ax = clean_legend(ax)
     if save:
         save_plot("gpytorch_gxpr.png")
+    else:
+        plt.show()
     plt.clf()
 
 
@@ -243,6 +247,8 @@ def plot_comparison_torch(model, dataset, trainer, save=True):
     # plt.tight_layout(rect=[0, 0.1, 1, 0.95])
     if save:
         save_plot("gpytorch_comparison.png")
+    else:
+        plt.show()
     plt.clf()
 
 
