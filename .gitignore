@@ -12,3 +12,6 @@ src/**/*.ipynb
 
 # Ignore 'sandbox' work
 latent_forces/
+
+# Ignore documentation build
+docs/build/
