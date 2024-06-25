@@ -22,6 +22,7 @@ from gpjax.typing import (
     KeyArray,
     ScalarFloat,
 )
+from gpjax.scan import vscan
 from gpjax.objectives import AbstractObjective
 from gpjax.dataset import Dataset
 
@@ -30,10 +31,6 @@ ModuleModel = TypeVar("ModuleModel", bound=ExactLFM)
 # Set the random seed for reproducibility
 jax.config.update("jax_enable_x64", True)
 key = jax.random.PRNGKey(42)
-
-
-# TODO: add docstrings
-# TODO: add typehints
 
 
 class JaxTrainer:
@@ -149,7 +146,6 @@ class JaxTrainer:
         """
         new_sensitivities = model.true_s.at[3].set(1.0)
         new_decays = model.true_d.at[3].set(0.8)
-        new_decays = model.true_d
 
         updated_model = model.replace(true_s=new_sensitivities, true_d=new_decays)
 
@@ -200,11 +196,12 @@ class JaxTrainer:
             carry = model, opt_state
             return carry, loss_val
 
-        (model, _), history = jax.lax.scan(
+        (model, _), history = vscan(
             step_fn, (self.model, state), (iter_keys, jnp.arange(self.num_iters))
         )
 
-        self.model = model.constrain()
+        model = model.constrain()
+        self.model = self.after_epoch_jax(model)
         self.history = history
         if self.track_parameters:
             return self.model, self.history, self.track_parameters
