@@ -3,14 +3,19 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Modelling Transcriptional Regulation using GPs's documentation!
-==========================================================================
+Modelling Transcriptional Regulation using Gaussian Processes
+==============================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-
+   dataset
+   model
+   objective
+   trainer
+   plotter
+   main
 
 Indices and tables
 ==================
