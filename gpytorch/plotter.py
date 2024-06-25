@@ -2,6 +2,7 @@
 Plotting functions for GPyTorch implementation.
 """
 
+import os
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,7 +17,7 @@ colors = rcParams["axes.prop_cycle"].by_key()["color"]
 # TODO: add saving functionality
 
 
-def plot_lf(gp, timepoints, stddev=2, scatter=None):
+def plot_lf(gp, timepoints, stddev=2, scatter=None, save=True):
     """
     Plot latent force model. (fig. 1a in Lawrence et al. 2007)
 
@@ -30,11 +31,13 @@ def plot_lf(gp, timepoints, stddev=2, scatter=None):
         Number of standard deviations to plot around the mean. Default is 2.
     scatter: torch.Tensor, optional
         Scatter points to plot. Default is None.
+    save: bool, optional
+        Save the plot. Default is True.
     """
     mean = gp.mean.detach().squeeze()
     std = gp.variance.detach().sqrt().squeeze()
 
-    fig, ax = plt.subplots(figsize=(7.5, 2.5))
+    fig, ax = plt.subplots(figsize=(7.5, 2.5), dpi=300)
 
     ax.fill_between(
         timepoints,
@@ -71,14 +74,30 @@ def plot_lf(gp, timepoints, stddev=2, scatter=None):
     ax.set_title("Latent Force Model (GPyTorch)")
     ax = clean_legend(ax)
 
-    plt.show()
+    if save:
+        save_plot("gpytorch_lf.png")
+    plt.clf()
 
 
-def plot_gxpred(gp, timepoints, dataset, stddev=2, scatter=None):
+def plot_gxpred(gp, timepoints, dataset, stddev=2, scatter=None, save=True):
     """
     Plot gene expression predictions (Kxx).
-    """
 
+    Parameters
+    ----------
+    gp: gpytorch.distributions.MultivariateNormal
+        Trained GP model.
+    timepoints: torch.Tensor
+        Timepoints.
+    dataset: PyTorchDataset
+        Dataset used for training.
+    stddev: int, optional
+        Number of standard deviations to plot around the mean. Default is 2.
+    scatter: torch.Tensor, optional
+        Scatter points to plot. Default is None.
+    save: bool, optional
+        Save the plot. Default is True.
+    """
     mean = gp.mean.detach()
     std = gp.variance.detach().sqrt()
     num_genes = mean.shape[1]
@@ -88,7 +107,7 @@ def plot_gxpred(gp, timepoints, dataset, stddev=2, scatter=None):
     else:
         gene_names = [f"Gene {i}" for i in range(num_genes)]
 
-    fig = plt.figure(figsize=(7.5, 5.5 * np.ceil(num_genes / 3)))
+    fig = plt.figure(figsize=(7.5, 5.5 * np.ceil(num_genes / 3)), dpi=300)
 
     for i in range(num_genes):
         ax = fig.add_subplot(num_genes, min(num_genes, 1), i + 1)
@@ -132,11 +151,12 @@ def plot_gxpred(gp, timepoints, dataset, stddev=2, scatter=None):
         ax.set_ylabel("Expression Level")
         ax.legend()
         ax = clean_legend(ax)
+    if save:
+        save_plot("gpytorch_gxpr.png")
+    plt.clf()
 
-    plt.show()
 
-
-def plot_comparison_torch(model, dataset, trainer):
+def plot_comparison_torch(model, dataset, trainer, save=True):
     """
     Plot double bar chart showing inference results on the hyperparameters for p53 dataset.
 
@@ -148,6 +168,8 @@ def plot_comparison_torch(model, dataset, trainer):
         Dataset used for training (contains ground truth parameters).
     trainer: TorchTrainer
         Trainer used for training the model (contains learned parameters).
+    save: bool, optional
+        Save the plot. Default is True.
     """
 
     # Extract ground truth parameters from dataset
@@ -175,7 +197,7 @@ def plot_comparison_torch(model, dataset, trainer):
     gene_names = dataset.gene_names
 
     # Create plot
-    fig, axes = plt.subplots(1, 3, figsize=(7.5, 2.5))
+    fig, axes = plt.subplots(1, 3, figsize=(7.5, 2.5), dpi=300)
 
     true_colour = colors[0]
     learned_colour = colors[1]
@@ -219,7 +241,9 @@ def plot_comparison_torch(model, dataset, trainer):
     # fig.legend(handles, labels, loc='center', ncol=2, fontsize='medium')
 
     # plt.tight_layout(rect=[0, 0.1, 1, 0.95])
-    plt.show()
+    if save:
+        save_plot("gpytorch_comparison.png")
+    plt.clf()
 
 
 def clean_legend(ax):
@@ -240,3 +264,24 @@ def clean_legend(ax):
     handles, labels = ax.get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
     ax.legend(by_label.values(), by_label.keys())
+
+
+def save_plot(plot_name):
+    """
+    Save plots to gpytorch/plots regardless of where script is run from.
+
+    Parameters
+    ----------
+    plot_name: str
+        Name of the plot to save.
+    """
+
+    # Get the directory of the script file
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    plots_dir = os.path.join(script_dir, "plots")
+
+    os.makedirs(plots_dir, exist_ok=True)
+
+    save_name = os.path.join(plots_dir, plot_name)
+    print(f"Saving plot to {save_name}")
+    plt.savefig(save_name, format="png", facecolor="white")
