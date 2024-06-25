@@ -18,7 +18,7 @@ import jax
 jax.config.update("jax_enable_x64", True)
 
 
-class JAXP53_Data:
+class JaxP53Data:
     """
     Custom data handling class for managing gene expression data from the Barenco et al. paper. Provides structured access to gene expressions, their variances, and associated timepoints, optionally filtered by replicates.
 
