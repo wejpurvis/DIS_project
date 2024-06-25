@@ -167,20 +167,21 @@ class JaxTrainer:
         r"""Train a Module model with respect to a supplied Objective function for a given number of iterations. Optimisers used here should originate from Optax.
 
         Example:
-        ```python
-        >>> # Define the model, objective, training data, and optimizer
-        >>> model = ExactLFM(kernel, t, y)
-        >>> objective = MarginalLikelihood()
-        >>> training_data = Dataset(t, y)
-        >>> optim = optax.adam(1e-3)
-        >>> key = jax.random.PRNGKey(42)
-        >>> num_iters = 1000
-        >>> track_parameters = ["s", "d"]
-        >>> # Create a trainer instance
-        >>> trainer = JaxTrainer(model, objective, training_data, optim, key, num_iters, track_parameters)
-        >>> # Train the model
-        >>> model, history, track_parameters = trainer.fit(num_steps_per_epoch=100)
-        ```
+
+        .. code-block:: python
+
+            >>> # Define the model, objective, training data, and optimizer
+            >>> model = ExactLFM(kernel, t, y)
+            >>> objective = MarginalLikelihood()
+            >>> training_data = Dataset(t, y)
+            >>> optim = optax.adam(1e-3)
+            >>> key = jax.random.PRNGKey(42)
+            >>> num_iters = 1000
+            >>> track_parameters = ["s", "d"]
+            >>> # Create a trainer instance
+            >>> trainer = JaxTrainer(model, objective, training_data, optim, key, num_iters, track_parameters)
+            >>> # Train the model
+            >>> model, history, track_parameters = trainer.fit(num_steps_per_epoch=100)
 
         Parameters
         ----------
