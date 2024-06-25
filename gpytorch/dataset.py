@@ -145,10 +145,20 @@ def load_barenco_data(dir_path):
     """
 
     # Load data from .csv files
-    with open(os.path.join(dir_path, "barencoPUMA_exprs.csv"), "r") as f:
-        gene_expressions = pd.read_csv(f, index_col=0)
-    with open(os.path.join(dir_path, "barencoPUMA_se.csv"), "r") as f:
-        gene_expressions_se = pd.read_csv(f, index_col=0)
+    try:
+        with open(os.path.join(dir_path, "barencoPUMA_exprs.csv"), "r") as f:
+            gene_expressions = pd.read_csv(f, index_col=0)
+    except FileNotFoundError:
+        print(
+            "Please download the gene expression data and place it in the appropriate directory."
+        )
+    try:
+        with open(os.path.join(dir_path, "barencoPUMA_se.csv"), "r") as f:
+            gene_expressions_se = pd.read_csv(f, index_col=0)
+    except FileNotFoundError:
+        print(
+            "Please download the gene expression variance data and place it in the appropriate directory."
+        )
 
     columns = [f"cARP{r}-{t}hrs.CEL" for r in range(1, 4) for t in np.arange(7) * 2]
 
