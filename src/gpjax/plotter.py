@@ -17,9 +17,11 @@ import beartype.typing as tp
 
 CustomModel = tp.TypeVar("CustomModel", bound="ExactLFM")
 
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+# plt.style.use(
+#     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+# )
+
+plt.style.use("../../dissertation.mplstyle")
 
 colors = rcParams["axes.prop_cycle"].by_key()["color"]
 

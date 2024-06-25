@@ -8,9 +8,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rcParams
 
-plt.style.use(
-    "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-)
+# plt.style.use(
+#     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+# )
+
+plt.style.use("../../dissertation.mplstyle")
 
 colors = rcParams["axes.prop_cycle"].by_key()["color"]
 
