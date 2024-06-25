@@ -6,3 +6,6 @@ data/
 
 # Ignore all .npy files
 **/*.npy
+
+# Ignore jupyter notebook in gpytorch dir
+gpytorch/*.ipynb
