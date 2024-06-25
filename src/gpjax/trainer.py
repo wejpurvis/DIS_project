@@ -216,7 +216,7 @@ class JaxTrainer:
 
         model = model.constrain()
         if fix_params:
-            self.model = self.after_epoch_jax(model)
+            self.model = self.after_epoch_jax(model, fix_params)
         else:
             self.model = model
 
