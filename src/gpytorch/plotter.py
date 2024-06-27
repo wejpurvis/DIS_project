@@ -3,11 +3,13 @@ Plotting functions for GPyTorch implementation.
 """
 
 import os
+import csv
 import shutil
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rcParams
+from tabulate import tabulate
 
 if shutil.which("latex"):
     plt.style.use(
@@ -203,6 +205,27 @@ def plot_comparison_torch(model, dataset, trainer, save=True):
 
     # Get gene names from dataset
     gene_names = dataset.gene_names
+
+    # Combine the data into a table
+    data = zip(gene_names, basal_learned, sensitivity_learned, decay_learned)
+    headers = ["Gene Name", "Basal", "Sensitivity", "Decay"]
+
+    # Print the table
+    print("\n")
+    print(tabulate(data, headers=headers, tablefmt="fancy_grid"))
+    print("\n")
+
+    data = zip(gene_names, basal_learned, sensitivity_learned, decay_learned)
+    headers = ["Gene Name", "Basal", "Sensitivity", "Decay"]
+
+    # Write the table to a CSV file
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    save_name = os.path.join(script_dir, "hyperparams.csv")
+
+    with open(save_name, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(headers)
+        writer.writerows(data)
 
     # Create plot
     fig, axes = plt.subplots(1, 3, figsize=(7.5, 2.5), dpi=300)

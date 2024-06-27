@@ -52,11 +52,11 @@ if __name__ == "__main__":
     p_f = model.predict_f(t_predict, jitter=1e-3)
     p_m = model.predict_m(t_predict, jitter=1e-3)
 
-    # Plot latent force
-    plot_lf(p_f, t_predict, scatter=dataset.f_observed[0, 0])
-
     # Plot gene expression predictions
     plot_gxpred(p_m, t_predict, dataset)
+
+    # Plot latent force
+    plot_lf(p_f, t_predict, scatter=dataset.f_observed[0, 0])
 
     # Plot hyperparameter comparison
     plot_comparison_torch(model, dataset, trainer)
