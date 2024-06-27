@@ -29,8 +29,7 @@ class CustomConjMLL(gpx.objectives.AbstractObjective):
         function values.
 
         For a training dataset :math:`\{x_n, y_n\}_{n=1}^N`, set of test inputs
-        :math:`\mathbf{x}^{\star}` and the corresponding latent function evaluations are given
-        by :math:`\mathbf{f} = f(\mathbf{x})` and :math:`\mathbf{f}^{\star} = f(\mathbf{x}^{\star})`, the marginal log-likelihood is given by:
+        :math:`\mathbf{x}^{\star}` and the corresponding latent function evaluations are given by :math:`\mathbf{f} = f(\mathbf{x})` and :math:`\mathbf{f}^{\star} = f(\mathbf{x}^{\star})`, the marginal log-likelihood is given by:
 
         .. math::
             \log p(\mathbf{y}) &= \int p(\mathbf{y} \mid \mathbf{f}) p(\mathbf{f}, \mathbf{f}^{\star}) \, \mathrm{d} \mathbf{f}^{\star} \\
