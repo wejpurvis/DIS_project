@@ -42,7 +42,7 @@ class JaxP53Data:
         Array of gene expression variances for the selected replicate.
     """
 
-    def __init__(self, replicate=None, data_dir="data"):
+    def __init__(self, replicate=None, data_dir="data", selected_genes=None):
         """
         Initialises JAXP53_Data object by loading data from specified directory and filtering by replicate if needed.
 
@@ -52,12 +52,55 @@ class JaxP53Data:
             Replicate number to filter the data by. If None, all replicates are used. Default is None. Error is raised if replicate number is out of range.
         data_dir : str, optional
             Path to directory containing the data files. Default is '../data/'.
+        selected_genes : list of str, optional
+            List of gene names to load. If None, all genes are loaded. Default is None.
         """
         gene_data = load_barenco_data(data_dir)
+        all_genes = gene_data["gene_names"]
 
-        self.gene_names = gene_data["gene_names"]
-        self.gene_expressions = gene_data["gene_expressions"]
-        self.gene_variances_raw = gene_data["gene_variances"]
+        if selected_genes is not None:
+            # Error handling for provided gene names
+            valid_genes = set(all_genes)
+            selected_genes_set = set(selected_genes)
+
+            # Check if genes are valid
+            if not selected_genes_set.issubset(valid_genes):
+                missing_genes = selected_genes_set - valid_genes
+                raise ValueError(
+                    f"Invalid gene names provided: {', '.join(missing_genes)}"
+                )
+            # Check for duplicates by comparing list and set lengths
+            if len(selected_genes) != len(selected_genes_set):
+                duplicates = [
+                    gene for gene in selected_genes if selected_genes.count(gene) > 1
+                ]
+                raise ValueError(
+                    f"Duplicate genes provided: {', '.join(set(duplicates))}"
+                )
+
+            # Check if genes are empty
+            if len(selected_genes) == 0:
+                raise ValueError(
+                    "Empty list of genes selected, set 'selected_genes' to None"
+                )
+
+            indices = [
+                i
+                for i, gene in enumerate(gene_data["gene_names"])
+                if gene in selected_genes
+            ]
+            self.selected_indices = [
+                all_genes.index(gene) for gene in selected_genes if gene in all_genes
+            ]
+            self.gene_names = selected_genes
+            self.gene_expressions = gene_data["gene_expressions"][:, indices]
+            self.gene_variances_raw = gene_data["gene_variances"][:, indices]
+        else:
+            self.selected_indices = list(range(len(all_genes)))
+            self.gene_names = gene_data["gene_names"]
+            self.gene_expressions = gene_data["gene_expressions"]
+            self.gene_variances_raw = gene_data["gene_variances"]
+
         self.num_genes = len(self.gene_names)
         self.timepoints = jnp.linspace(0, 12, 7)
 
@@ -140,8 +183,7 @@ class JaxP53Data:
         jnp_data = jnp.array(self.data)
         return jnp_data.shape
 
-    @staticmethod
-    def params_ground_truth():
+    def params_ground_truth(self):
         """
         Ground truth parameters for the SIMM model, measured experimentally by Barenco et al. (2006).
 
@@ -156,6 +198,12 @@ class JaxP53Data:
         B_exact = np.array([0.0649, 0.0069, 0.0181, 0.0033, 0.0869])
         D_exact = np.array([0.2829, 0.3720, 0.3617, 0.8000, 0.3573])
         S_exact = np.array([0.9075, 0.9748, 0.9785, 1.0000, 0.9680])
+
+        # Use self.selected_indices to filter the data
+        B_exact = B_exact[self.selected_indices]
+        D_exact = D_exact[self.selected_indices]
+        S_exact = S_exact[self.selected_indices]
+
         return B_exact, S_exact, D_exact
 
 
