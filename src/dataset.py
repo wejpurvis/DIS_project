@@ -42,7 +42,7 @@ class JaxP53Data:
         Array of gene expression variances for the selected replicate.
     """
 
-    def __init__(self, replicate=None, data_dir="data"):
+    def __init__(self, replicate=None, data_dir="../data"):
         """
         Initialises JAXP53_Data object by loading data from specified directory and filtering by replicate if needed.
 
