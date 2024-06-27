@@ -104,25 +104,6 @@ def plot_lf(
     plt.clf()
 
 
-def plot_gxpred(
-    testing_times: Float[Array, "1 3"],
-    predictive_dist: GaussianDistribution,
-    stddev: Optional[int] = 2,
-    y_scatter: Optional[Float[Array, "7 "]] = None,
-    save: Optional[bool] = True,
-):
-    """
-    Plot gene expression predictions (Kxx).
-    """
-
-    mean = predictive_dist.mean()
-    std = predictive_dist.stddev()
-
-    # TODO look into tensorflow_probability.substrates.jax.distributions.MultivariateNormalFullCovariance
-
-    raise NotImplementedError("plot_gxpred not implemented yet")
-
-
 def plot_comparison_gpjax(
     model: CustomModel, dataset: JaxP53Data, save: Optional[bool] = True
 ):
