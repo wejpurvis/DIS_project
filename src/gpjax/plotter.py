@@ -3,6 +3,7 @@ Plotting functions for GPJax implementation.
 """
 
 import os
+import shutil
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import jax.numpy as jnp
@@ -17,13 +18,14 @@ import beartype.typing as tp
 
 CustomModel = tp.TypeVar("CustomModel", bound="ExactLFM")
 
-# plt.style.use(
-#     "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
-# )
-
-relative_style_path = "../../dissertation.mplstyle"
-absolute_style_path = os.path.join(os.path.dirname(__file__), relative_style_path)
-plt.style.use(absolute_style_path)
+if shutil.which("latex"):
+    plt.style.use(
+        "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+    )
+else:
+    relative_style_path = "../../dissertation.mplstyle"
+    absolute_style_path = os.path.join(os.path.dirname(__file__), relative_style_path)
+    plt.style.use(absolute_style_path)
 
 colors = rcParams["axes.prop_cycle"].by_key()["color"]
 
