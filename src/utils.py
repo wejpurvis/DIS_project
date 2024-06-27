@@ -4,14 +4,26 @@ Includes the prediction class for gene expressions
 """
 
 import jax
+import shutil
+import os
 from model import ExactLFM
 from dataset import JaxP53Data
 from tabulate import tabulate
 import beartype.typing as tp
 import jax.numpy as jnp
 from beartype.typing import Optional
+from plotter import save_plot, clean_legend
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+
+if shutil.which("latex"):
+    plt.style.use(
+        "https://raw.githubusercontent.com/JaxGaussianProcesses/GPJax/main/docs/examples/gpjax.mplstyle"
+    )
+else:
+    relative_style_path = "../dissertation.mplstyle"
+    absolute_style_path = os.path.join(os.path.dirname(__file__), relative_style_path)
+    plt.style.use(absolute_style_path)
 
 colors = rcParams["axes.prop_cycle"].by_key()["color"]
 
@@ -121,7 +133,7 @@ class GeneExpressionPredictor:
 
         return gene_1, gene_2, gene_3, gene_4, gene_5
 
-    def plot_predictions(self, p53_data, stddev=2):
+    def plot_predictions(self, p53_data, stddev=2, save=True):
         """
         Plot gene expression predictions (Kxx).
 
@@ -137,6 +149,8 @@ class GeneExpressionPredictor:
             P53 data.
         stddev : int, optional
             Number of standard deviations to plot around the mean. Default is 2.
+        save : bool, optional
+            Save the plot. Default is True.
         """
         xpr_times = self.generate_test_times_pred()
         all_gene_dists = self.model.multi_gene_predict(xpr_times, p53_data)
@@ -151,7 +165,7 @@ class GeneExpressionPredictor:
             gene_names = [f"Gene {i+1}" for i in range(self.num_genes)]
 
         timepoints = xpr_times[:100, 0]
-        fig = plt.figure(figsize=(7.5, 5.5 * jnp.ceil(self.num_genes / 3)))
+        fig = plt.figure(figsize=(7.5, 5.5 * jnp.ceil(self.num_genes / 3)), dpi=300)
 
         for i in range(self.num_genes):
             ax = fig.add_subplot(self.num_genes, min(self.num_genes, 1), i + 1)
@@ -190,14 +204,16 @@ class GeneExpressionPredictor:
                 label="True values",
             )
 
-            # lb = min(mean)
-            # ub = max(mean)
-            # ax.set_ylim(lb - 0.2 * lb, ub * 1.2)
             ax.set_title(f"{gene_names[i]} Expression Over Time")
             ax.set_xlabel("Time")
             ax.set_ylabel("Expression Level")
+            ax = clean_legend(ax)
 
-        plt.show()
+        if save:
+            save_plot("gpjax_gxpr.png")
+        else:
+            plt.show()
+        plt.clf()
 
 
 def print_hyperparams(model: CustomModel, dataset: JaxP53Data):
