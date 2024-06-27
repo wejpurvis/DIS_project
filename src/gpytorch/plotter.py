@@ -20,8 +20,6 @@ else:
 
 colors = rcParams["axes.prop_cycle"].by_key()["color"]
 
-# TODO: add saving functionality
-
 
 def plot_lf(gp, timepoints, stddev=2, scatter=None, save=True):
     """
