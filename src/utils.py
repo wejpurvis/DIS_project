@@ -158,12 +158,11 @@ class GeneExpressionPredictor:
         if self.num_genes == 5:
             means = self.decompose_predictions2(all_gene_dists.mean())
             stds = self.decompose_predictions2(all_gene_dists.stddev())
-            gene_names = self.gene_names
         else:
             means = self.decompose_predictions(all_gene_dists.mean())
             stds = self.decompose_predictions(all_gene_dists.stddev())
-            gene_names = [f"Gene {i+1}" for i in range(self.num_genes)]
 
+        gene_names = self.gene_names
         timepoints = xpr_times[:100, 0]
         fig = plt.figure(figsize=(7.5, 5.5 * jnp.ceil(self.num_genes / 3)), dpi=300)
 
@@ -199,7 +198,7 @@ class GeneExpressionPredictor:
 
             ax.scatter(
                 p53_data.timepoints,
-                p53_data.gene_expressions[:, i],
+                p53_data.gene_expressions[:, i].flatten(),
                 color=colors[0],
                 label="True values",
             )
