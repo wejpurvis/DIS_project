@@ -149,8 +149,8 @@ class JaxTrainer:
             The updated model.
         """
         if fix_params:
-            new_sensitivities = model.true_s.at[3].set(1.0)
-            new_decays = model.true_d.at[3].set(0.8)
+            new_sensitivities = model.true_s.at[3].set(jnp.array(1, dtype=jnp.float64))
+            new_decays = model.true_d.at[3].set(jnp.array(0.8, dtype=jnp.float64))
         else:
             new_sensitivities = model.true_s
             new_decays = model.true_d
