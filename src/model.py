@@ -40,7 +40,7 @@ class ExactLFM(gpx.base.Module):
 
     # Get data (number of genes) and initialise hyperparameters
     data: JaxP53Data = static_field(default_factory=lambda: JaxP53Data())
-    num_genes: int = static_field(init=False)
+    num_genes: int = static_field(5)
 
     initial_decays: Float[Array, "1 N"] = static_field(init=False)
     initial_sensitivities: Float[Array, "1 N"] = static_field(init=False)
@@ -69,7 +69,6 @@ class ExactLFM(gpx.base.Module):
 
     # Set initial values for hyperparameters
     def __post_init__(self):
-        self.num_genes = self.data.num_genes
         self.initial_decays = jnp.array([0.4] * self.num_genes, dtype=jnp.float64)
         self.initial_sensitivities = jnp.array(
             [1.0] * self.num_genes, dtype=jnp.float64
