@@ -12,12 +12,12 @@ import jax.numpy as jnp
 import optax as ox
 
 
-from dataset import JaxP53Data, dataset_3d, generate_test_times
+from dataset import JaxP53Data, dataset_3d
 from plotter import plot_lf, plot_comparison_gpjax
 from model import ExactLFM
 from objectives import CustomConjMLL
 from trainer import JaxTrainer
-from utils import print_hyperparams
+from utils import GeneExpressionPredictor, print_hyperparams, generate_test_times
 
 key = jax.random.PRNGKey(42)
 
@@ -60,14 +60,14 @@ if __name__ == "__main__":
     print("Making predictions and plotting...")
     testing_times = generate_test_times()
     latent_dist = trained_model.latent_predict(testing_times, p53_data)
-    # TODO: Add gene expression predictions
 
     # Plot latent force
     f = p53_data.f_observed.squeeze()
     plot_lf(testing_times, latent_dist, y_scatter=f, stddev=2)
 
     # Plot gene expression predictions
-    # TODO
+    gene_predictor = GeneExpressionPredictor(trained_model, p53_data)
+    gene_predictor.plot_predictions(p53_data)
 
     # Plot hyperparameter comparison
     plot_comparison_gpjax(trained_model, p53_data)
