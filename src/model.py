@@ -117,12 +117,6 @@ class ExactLFM(gpx.base.Module):
         kxf_switch = f1 * (1 - f2)
         kxf_t_switch = (1 - f1) * f2
 
-        # Debug prints (which switch is active)
-        # print(f"Kxx switch: {kxx_switch}")
-        # print(f"Kff switch: {kff_switch}")
-        # print(f"Kxf switch: {kxf_switch}")
-        # print(f"Kxf_t switch: {kxf_t_switch}")
-
         final_kernel = (
             kxx_switch * self.kernel_xx(t, t_prime)
             + kff_switch * self.kernel_ff(t, t_prime)
