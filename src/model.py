@@ -97,8 +97,7 @@ class ExactLFM(gpx.base.Module):
     def mean_function(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
         f = jnp.array(x[:, 2:], dtype=int)
 
-        num_genes = 5
-        block_size = x.shape[0] // num_genes
+        block_size = x.shape[0] // self.num_genes
         mean = (self.true_b / self.true_d).reshape(-1, 1)
         mean = mean.repeat(block_size, jnp.newaxis).reshape(-1, 1)
 
@@ -270,49 +269,6 @@ class ExactLFM(gpx.base.Module):
         var += cola.ops.I_like(var) * self.jitter
 
         return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), var)
-
-    # def single_gene_predict(self, test_inputs: Num[Array, "N D"], gene: Int[Array, " O"], train_data: JAXP53_Data) -> GaussianDistribution:
-    #     x, y, variances = dataset_3d(train_data)
-    #     t = test_inputs
-    #     obs_noise = self.obs_stddev ** 2
-
-    #     t2 = t.at[:,2].set(1)
-    #     t = t2
-
-    #     mean_x = self.mean_function(x)
-
-    #     # Slice traning data for given gene (not needed when multivariate)
-    #     start_slice = (gene - 1) * 7
-    #     end_slice = start_slice + 7
-
-    #     x = x[start_slice:end_slice]
-    #     y = y[start_slice:end_slice]
-    #     variances = variances[start_slice:end_slice]
-    #     mean_x = mean_x[start_slice:end_slice]
-
-    #     diag_variances = jnp.diag(variances.reshape(-1))
-
-    #     Kxx = self.gram(self.kernel, x)
-
-    #     # Σ = Kxx + Io²
-    #     Sigma = Kxx + diag_variances
-    #     Sigma += cola.ops.I_like(Sigma) * obs_noise
-    #     Sigma = cola.PSD(Sigma)
-
-    #     mean_t = self.mean_function(t)
-    #     Ktt = self.gram(self.kernel, t)
-    #     Kxt = self.cross_covariance(self.kernel, x, t)
-    #     Sigma_inv_Kxt = cola.solve(Sigma, Kxt)
-
-    #     # μt  +  Ktx (Kxx + Io²)⁻¹ (y  -  μx)
-    #     mean = mean_t + jnp.matmul(Sigma_inv_Kxt.T, y - mean_x)
-
-    #     # Ktt  -  Ktx (Kxx + Io²)⁻¹ Kxt
-    #     var = Ktt - jnp.matmul(Kxt.T, Sigma_inv_Kxt)
-    #     var += cola.ops.I_like(var) * self.jitter
-    #     var = cola.PSD(var)
-
-    #     return GaussianDistribution(jnp.atleast_1d(mean.squeeze()), var)
 
     def multi_gene_predict(
         self, test_inputs: Num[Array, "N D"], train_data: JaxP53Data
