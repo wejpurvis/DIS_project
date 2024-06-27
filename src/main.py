@@ -17,6 +17,7 @@ from plotter import plot_lf, plot_comparison_gpjax
 from model import ExactLFM
 from objectives import CustomConjMLL
 from trainer import JaxTrainer
+from utils import print_hyperparams
 
 key = jax.random.PRNGKey(42)
 
@@ -51,6 +52,9 @@ if __name__ == "__main__":
     # Train the model
     print("Training model...")
     trained_model, training_history = trainer.fit(num_steps_per_epoch=1000)
+
+    # Print the learned hyperparameters
+    print_hyperparams(trained_model, p53_data)
 
     # Make predictions
     print("Making predictions and plotting...")
