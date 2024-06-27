@@ -7,7 +7,7 @@ import jax.numpy as jnp
 import tensorflow_probability.substrates.jax.bijectors as tfb
 
 from beartype.typing import Union
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import beartype.typing as tp
 import cola
@@ -19,6 +19,7 @@ from gpjax.base import param_field, static_field
 from gpjax.distributions import GaussianDistribution
 from gpjax.typing import Array, ScalarFloat
 from jaxtyping import Float, Num
+from dataset import JaxP53Data
 
 
 Kernel = tp.TypeVar("Kernel", bound="gpx.kernels.base.AbstractKernel")
@@ -37,46 +38,58 @@ class ExactLFM(gpx.base.Module):
         jnp.array(1.0), bijector=tfb.Softplus()
     )
 
-    ####### Define parameters
+    # Get data (number of genes) and initialise hyperparameters
+    data: JaxP53Data = static_field(default_factory=lambda: JaxP53Data())
+    num_genes: int = static_field(init=False)
 
-    # Sensitivities of the genes
-    initial_sensitivities = jnp.array([1.0, 1.0, 1.0, 1.0, 1.0], dtype=jnp.float64)
+    initial_decays: Float[Array, "1 N"] = static_field(init=False)
+    initial_sensitivities: Float[Array, "1 N"] = static_field(init=False)
+    initial_basals: Float[Array, "1 N"] = static_field(init=False)
 
-    true_s: Float[Array, "1 5"] = param_field(
-        initial_sensitivities,
-        bijector=tfb.Softplus(),
-        metadata={"name": " kxx_sensitivities"},
-        trainable=True,
-    )
-
-    # Degradation rates of the genes
-    initial_decays = jnp.array([0.4, 0.4, 0.4, 0.4, 0.4], dtype=jnp.float64)
-
-    true_d: Float[Array, "1 5"] = param_field(
-        initial_decays,
+    true_d: Float[Array, "1 N"] = param_field(
+        init=False,
         bijector=tfb.Softplus(),
         metadata={"name": " kxx_degradations"},
         trainable=True,
     )
 
+    true_s: Float[Array, "1 5"] = param_field(
+        init=False,
+        bijector=tfb.Softplus(),
+        metadata={"name": " kxx_sensitivities"},
+        trainable=True,
+    )
+
+    true_b: Float[Array, "1 5"] = param_field(
+        init=False,
+        bijector=tfb.Softplus(),
+        metadata={"name": " basal_rates"},
+        trainable=True,
+    )
+
+    # Set initial values for hyperparameters
+    def __post_init__(self):
+        self.num_genes = self.data.num_genes
+        self.initial_decays = jnp.array([0.4] * self.num_genes, dtype=jnp.float64)
+        self.initial_sensitivities = jnp.array(
+            [1.0] * self.num_genes, dtype=jnp.float64
+        )
+        self.initial_basals = jnp.array([0.05] * self.num_genes, dtype=jnp.float64)
+
+        self.true_d = self.initial_decays
+        self.true_s = self.initial_sensitivities
+        self.true_b = self.initial_basals
+
     # Restrict lengthscale to be between 0.5 and 3.5
     l_bijector = tfb.Sigmoid(low=0.5, high=3.5)
 
+    # l doesn't depend on the number of genes
     initial_lengthscale = jnp.array(2.5, dtype=jnp.float64)
 
     l: Float[Array, " O"] = param_field(
         initial_lengthscale,
         bijector=l_bijector,
         metadata={"name": "lengthscale"},
-        trainable=True,
-    )
-
-    initial_constrained_b = jnp.array([0.05, 0.05, 0.05, 0.05, 0.05], dtype=jnp.float64)
-
-    true_b: Float[Array, "1 5"] = param_field(
-        initial_constrained_b,
-        bijector=tfb.Softplus(),
-        metadata={"name": " basal_rates"},
         trainable=True,
     )
 
