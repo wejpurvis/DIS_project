@@ -7,6 +7,9 @@ data/
 # Ignore all .npy files
 **/*.npy
 
+# Ignore all .csv files
+**/*.csv
+
 # Ignore jupyter notebooks in src
 src/**/*.ipynb
 
