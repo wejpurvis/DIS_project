@@ -340,25 +340,3 @@ def dataset_3d(data):
     variances = data.gene_variances.flatten().reshape(-1, 1)
 
     return training_times, gene_expressions, variances
-
-
-def generate_test_times(t=100):
-    """
-    Generate testing times for the GP model to predict the latent force function.
-
-    Parameters
-    ----------
-    t : int, optional
-        Number of testing times. Default is 80.
-
-    Returns
-    -------
-    testing_times : jnp.ndarray
-        Array of testing times of shape (t, 3) where t is the number of testing times.
-    """
-
-    times = jnp.linspace(0, 13, t)
-    # Gene indices shouldn't matter
-    gene_indices = jnp.repeat(-1, t)
-    testing_times = jnp.stack((times, gene_indices, jnp.repeat(0, t)), axis=-1)
-    return testing_times
