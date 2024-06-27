@@ -4,6 +4,7 @@ Includes the prediction class for gene expressions
 """
 
 import jax
+import csv
 import shutil
 import os
 from model import ExactLFM
@@ -229,7 +230,21 @@ def print_hyperparams(model: CustomModel, dataset: JaxP53Data):
     headers = ["Gene Name", "Basal", "Sensitivity", "Decay"]
 
     # Print the table
-    print(tabulate(data, headers=headers, tablefmt="grid"))
+    print("\n")
+    print(tabulate(data, headers=headers, tablefmt="fancy_grid"))
+    print("\n")
+
+    data = zip(gene_names, basal_learned, sensitivity_learned, decay_learned)
+    headers = ["Gene Name", "Basal", "Sensitivity", "Decay"]
+
+    # Write the table to a CSV file
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    save_name = os.path.join(script_dir, "hyperparams.csv")
+
+    with open(save_name, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(headers)
+        writer.writerows(data)
 
 
 def generate_test_times(t: Optional[int] = 100):
