@@ -134,7 +134,7 @@ class GeneExpressionPredictor:
 
         return gene_1, gene_2, gene_3, gene_4, gene_5
 
-    def plot_predictions(self, p53_data, stddev=2, save=True):
+    def plot_predictions(self, p53_data, stddev=2, save=True, save_name=None):
         """
         Plot gene expression predictions (Kxx).
 
@@ -152,6 +152,8 @@ class GeneExpressionPredictor:
             Number of standard deviations to plot around the mean. Default is 2.
         save : bool, optional
             Save the plot. Default is True.
+        save_name : str, optional
+            Additional info to add to the save name. Default is None.
         """
         xpr_times = self.generate_test_times_pred()
         all_gene_dists = self.model.multi_gene_predict(xpr_times, p53_data)
@@ -210,7 +212,7 @@ class GeneExpressionPredictor:
             ax = clean_legend(ax)
 
         if save:
-            save_plot("gpjax_gxpr.png")
+            save_plot(f"gpjax_gxpr_{save_name}.png")
         else:
             plt.show()
         plt.clf()
