@@ -35,6 +35,7 @@ def plot_lf(
     predictive_dist: GaussianDistribution,
     stddev: Optional[int] = 2,
     y_scatter: Optional[Float[Array, "7 "]] = None,
+    title: Optional[str] = None,
     save: Optional[bool] = True,
     save_name: Optional[str] = None,
 ):
@@ -51,6 +52,8 @@ def plot_lf(
         Number of standard deviations to plot around the mean. Default is 2.
     scatter: torch.Tensor, optional
         Scatter points to plot. Default is None.
+    title: str, optional
+        Additional info to add to the title. Default is None.
     save: bool, optional
         Save the plot. Default is True.
     save_name : str, optional
@@ -96,7 +99,10 @@ def plot_lf(
     ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
     ax.set_xlabel("Time")
     ax.set_ylabel("mRNA Expression")
-    ax.set_title("Latent Force Model (GPJax)")
+    if title is not None:
+        ax.set_title(f"Latent Force Model (GPJax) - {title}")
+    else:
+        ax.set_title("Latent Force Model (GPJax)")
     ax = clean_legend(ax)
 
     if save:
