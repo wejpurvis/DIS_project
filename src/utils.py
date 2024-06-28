@@ -212,7 +212,10 @@ class GeneExpressionPredictor:
             ax = clean_legend(ax)
 
         if save:
-            save_plot(f"gpjax_gxpr_{save_name}.png")
+            if save_name is not None:
+                save_plot(f"gpjax_gxpr_{save_name}.png")
+            else:
+                save_plot("gpjax_gxpr.png")
         else:
             plt.show()
         plt.clf()

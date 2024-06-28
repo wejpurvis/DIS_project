@@ -36,6 +36,7 @@ def plot_lf(
     stddev: Optional[int] = 2,
     y_scatter: Optional[Float[Array, "7 "]] = None,
     save: Optional[bool] = True,
+    save_name: Optional[str] = None,
 ):
     """
     Plot latent force model. (fig. 1a in Lawrence et al. 2007)
@@ -52,7 +53,8 @@ def plot_lf(
         Scatter points to plot. Default is None.
     save: bool, optional
         Save the plot. Default is True.
-
+    save_name : str, optional
+            Additional info to add to the save name. Default is None.
     """
     predictive_mean = predictive_dist.mean()
     predictive_std = predictive_dist.stddev()
@@ -98,7 +100,10 @@ def plot_lf(
     ax = clean_legend(ax)
 
     if save:
-        save_plot("gpjax_lf.png")
+        if save_name is not None:
+            save_plot(f"gpjax_lf_{save_name}.png")
+        else:
+            save_plot("gpjax_lf.png")
     else:
         plt.show()
     plt.clf()
