@@ -23,7 +23,9 @@ else:
 colors = rcParams["axes.prop_cycle"].by_key()["color"]
 
 
-def plot_lf(gp, timepoints, stddev=2, scatter=None, save=True):
+def plot_lf(
+    gp, timepoints, stddev=2, scatter=None, title=None, save=True, save_name=None
+):
     """
     Plot latent force model. (fig. 1a in Lawrence et al. 2007)
 
@@ -37,8 +39,12 @@ def plot_lf(gp, timepoints, stddev=2, scatter=None, save=True):
         Number of standard deviations to plot around the mean. Default is 2.
     scatter: torch.Tensor, optional
         Scatter points to plot. Default is None.
+    title: str, optional
+        Additional info to add to the title. Default is None.
     save: bool, optional
         Save the plot. Default is True.
+    save_name : str, optional
+        Additional info to add to the save name. Default is None.
     """
     mean = gp.mean.detach().squeeze()
     std = gp.variance.detach().sqrt().squeeze()
@@ -81,7 +87,10 @@ def plot_lf(gp, timepoints, stddev=2, scatter=None, save=True):
     ax = clean_legend(ax)
 
     if save:
-        save_plot("gpytorch_lf.png")
+        if save_name is not None:
+            save_plot(f"gpytorch_lf_{save_name}.png")
+        else:
+            save_plot("gpytorch_lf.png")
     else:
         plt.show()
     plt.clf()
