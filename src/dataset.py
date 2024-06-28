@@ -58,6 +58,9 @@ class JaxP53Data:
         gene_data = load_barenco_data(data_dir)
         all_genes = gene_data["gene_names"]
 
+        # Error trap replicate
+        assert replicate is None or 0 <= replicate < 3, "Invalid replicate number"
+
         if selected_genes is not None:
             # Error handling for provided gene names
             valid_genes = set(all_genes)
