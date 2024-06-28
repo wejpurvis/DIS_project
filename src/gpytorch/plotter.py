@@ -83,7 +83,10 @@ def plot_lf(
     ax.legend(loc="center left", bbox_to_anchor=(0.975, 0.5))
     ax.set_xlabel("Time")
     ax.set_ylabel("mRNA Expression")
-    ax.set_title("Latent Force Model (GPyTorch)")
+    if title is not None:
+        ax.set_title(f"Latent Force Model (GPyTorch) - {title}")
+    else:
+        ax.set_title("Latent Force Model (GPyTorch)")
     ax = clean_legend(ax)
 
     if save:
