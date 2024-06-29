@@ -5,7 +5,7 @@ This module is adapted from the [Alfi: Approximate Latent Force Inference](https
 import torch
 import gpytorch
 import numpy as np
-from dataset import PyTorchDataset
+from dataset_alfi import PyTorchDataset
 
 from gpytorch.mlls.exact_marginal_log_likelihood import ExactMarginalLogLikelihood
 from beartype.typing import Optional

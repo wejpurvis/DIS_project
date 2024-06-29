@@ -13,8 +13,8 @@ import numpy as np
 from matplotlib import rcParams
 from tabulate import tabulate
 from beartype.typing import Optional
-from dataset import PyTorchDataset
-from trainer import TorchTrainer
+from dataset_alfi import PyTorchDataset
+from trainer_alfi import TorchTrainer
 
 if shutil.which("latex"):
     plt.style.use(
@@ -211,7 +211,7 @@ def plot_comparison_torch(
         Trained model.
     dataset: :class:`dataset.PyTorchDataset`
         Dataset used for training (contains ground truth parameters).
-    trainer: TorchTrainer
+    trainer: :class:`trainer.TorchTrainer`
         Trainer used for training the model (contains learned parameters).
     save: bool, optional
         Save the plot. Default is True.
