@@ -179,17 +179,9 @@ class TorchKernel(gpytorch.kernels.Kernel):
         Sensitivity parameter
     variance : torch.Tensor
         Array of gene expression variances
-    lengthscale : torch.Tensor
-        Lengthscale parameter after applying constraint (for RBF kernel)
-    decay : torch.Tensor
-        Decay parameter after applying constraint (positive)
-    sensitivity : torch.Tensor
-        Sensitivity parameter after applying constraint (positive)
-    is_stationary : bool
-        Whether the kernel is stationary or not (True for SIMM kernel)
-
     """
 
+    # Whether kernel is stationary
     is_stationary = True
 
     def __init__(
@@ -238,6 +230,9 @@ class TorchKernel(gpytorch.kernels.Kernel):
 
     @property
     def lengthscale(self):
+        """
+        Lengthscale parameter after applying constraint (for RBF kernel)
+        """
         return self.lengthscale_constraint.transform(self.raw_lengthscale)
 
     @lengthscale.setter
@@ -248,6 +243,9 @@ class TorchKernel(gpytorch.kernels.Kernel):
 
     @property
     def decay(self):
+        """
+        Decay parameter after applying constraint (positive)
+        """
         return self.pos_constraint.transform(self.raw_decay)
 
     @decay.setter
@@ -256,6 +254,9 @@ class TorchKernel(gpytorch.kernels.Kernel):
 
     @property
     def sensitivity(self):
+        """
+        Sensitivity parameter after applying constraint (positive)
+        """
         return self.pos_constraint.transform(self.raw_sensitivity)
 
     @sensitivity.setter
@@ -479,13 +480,12 @@ class TorchMean(gpytorch.means.Mean):
     r"""
     Simple Input Motif mean function
 
-    ```math
+    .. math::
         f(x_{j}) = \frac{B_{j}}{D_{j}}
-    ```
 
     From equation 2 in paper.
 
-    $B_{j}$ represents the basal rate for gene $j$ and is a trainable parameter.
+    :math:`B_{j}` represents the basal rate for gene :math:`j` and is a trainable parameter.
 
     Parameters
     ----------
@@ -500,8 +500,6 @@ class TorchMean(gpytorch.means.Mean):
         Kernel function
     pos_contraint : gpytorch.constraints.Constraint
         Constraint for positive values
-    basal : torch.Tensor
-        Basal gene expression level
     num_genes : int
         Number of genes
     raw_basal : torch.Tensor
@@ -526,6 +524,9 @@ class TorchMean(gpytorch.means.Mean):
 
     @property
     def basal(self):
+        """
+        Basal gene expression level
+        """
         return self.pos_contraint.transform(self.raw_basal)
 
     @basal.setter
