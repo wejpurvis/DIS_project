@@ -11,10 +11,10 @@
 import torch
 import numpy as np
 
-from dataset import PyTorchDataset
-from model import ExactLFM
-from trainer import TorchTrainer
-from plotter import plot_lf, plot_gxpred, plot_comparison_torch
+from dataset_alfi import PyTorchDataset
+from model_alfi import ExactLFM
+from trainer_alfi import TorchTrainer
+from plotter_alfi import plot_lf, plot_gxpred, plot_comparison_torch
 
 from gpytorch.mlls.exact_marginal_log_likelihood import ExactMarginalLogLikelihood
 
