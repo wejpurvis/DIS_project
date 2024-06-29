@@ -37,14 +37,27 @@ class ExactLFM(gpx.base.Module):
     Examples
     --------
 
+    By default, the model will work with an input of five genes. An example of how to use this model is shown below for predicting the latent function:
+
     .. code-block:: python
 
         >>> # Load dataset
         >>> data = JaxP53Data()
         >>> # Instantiate the model
-        >>> model = ExactLFM(obs_stddev=0.1)
-        >>> # Train and predict
-        >>> predicted_distribution = model.multi_gene_predict(test_inputs, data)
+        >>> model = ExactLFM()
+        >>> # Define trainer an optimiser to train model
+        >>> trainer = JaxTrainer(model, CustomConjMLL(negative=True), dataset_train, optimiser, key, num_iters=150)
+        >>> # Train the model
+        >>> trained_model, training_history = trainer.fit(num_steps_per_epoch=1000)
+        >>> # Predict the latent function
+        >>> predicted_distribution = model.latent_predict(test_inputs, data)
+
+    For additional flexibility, the number of genes can be changed by setting the `num_genes` attribute of the model. The model can also be used to predict the gene expression values:
+
+    .. code-block:: python
+
+        >>> # Instantiate the model with 3 genes
+        >>> model = ExactLFM(num_genes=3)
     """
 
     # Define jitter (prior) and noise (likelihood)
