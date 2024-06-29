@@ -22,7 +22,7 @@ class TorchTrainer:
         The model to be trained.
     optimizers : list of torch.optim.Optimizer
         Optimizers used for training the model.
-    dataset : PyTorchDataset
+    dataset : :class:`dataset.PyTorchDataset`
         The complete dataset to be used for training, validation, and testing.
     loss_fn : callable
         A loss function that takes model outputs and targets and returns a loss.

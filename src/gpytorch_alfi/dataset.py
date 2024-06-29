@@ -52,7 +52,10 @@ class PyTorchDataset(Dataset):
     Examples
     --------
     Load the dataset:
-    >>> dataset = PyTorchDataset(replicate=0, data_dir="../data/")
+
+    .. code-block:: python
+
+        >>> dataset = PyTorchDataset(replicate=0, data_dir="../data/")
     """
 
     def __init__(

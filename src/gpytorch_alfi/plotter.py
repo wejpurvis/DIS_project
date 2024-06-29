@@ -127,7 +127,7 @@ def plot_gxpred(
         Trained GP model.
     timepoints: torch.Tensor
         Timepoints.
-    dataset: PyTorchDataset
+    dataset: :class:`dataset.PyTorchDataset`
         Dataset used for training.
     stddev: int, optional
         Number of standard deviations to plot around the mean. Default is 2.
@@ -209,7 +209,7 @@ def plot_comparison_torch(
     ----------
     model: gpytorch.models.ExactGP
         Trained model.
-    dataset: PyTorchDataset
+    dataset: :class:`dataset.PyTorchDataset`
         Dataset used for training (contains ground truth parameters).
     trainer: TorchTrainer
         Trainer used for training the model (contains learned parameters).

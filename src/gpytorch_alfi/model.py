@@ -19,7 +19,7 @@ class ExactLFM(gpytorch.models.ExactGP):
 
     Parameters
     ----------
-    dataset : PyTorchDataset
+    dataset : :class:`dataset.PyTorchDataset`
         Dataset containing gene expression data for project
     variance : np.array
         Array of gene expression variances
