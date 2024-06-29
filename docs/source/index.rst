@@ -16,6 +16,7 @@ Modelling Transcriptional Regulation using Gaussian Processes
    trainer
    plotter
    main
+   gpytorch_alfi
 
 Indices and tables
 ==================
