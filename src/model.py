@@ -29,7 +29,22 @@ Kernel = tp.TypeVar("Kernel", bound="gpx.kernels.base.AbstractKernel")
 @dataclass
 class ExactLFM(gpx.base.Module):
     """
-    GPJax implementation of the SIMM latent force model from Lawrence et al. (2006) using the p53 dataset.
+    GPJax implementation of the Single Input Motif Model (SIMM) latent force model from
+    Lawrence et al. (2006) using the p53 dataset. This class extends `gpx.base.Module`
+    to support shared parameters across mean functions and kernels, which is not
+    inherently supported by GPJax.
+
+    Examples
+    --------
+
+    .. code-block:: python
+
+        >>> # Load dataset
+        >>> data = JaxP53Data()
+        >>> # Instantiate the model
+        >>> model = ExactLFM(obs_stddev=0.1)
+        >>> # Train and predict
+        >>> predicted_distribution = model.multi_gene_predict(test_inputs, data)
     """
 
     # Define jitter (prior) and noise (likelihood)
@@ -291,6 +306,27 @@ class ExactLFM(gpx.base.Module):
         t1: Float[Array, " O"],
         t2: Float[Array, " O"],
     ) -> ScalarFloat:
+        """
+        Analytical solution for the convolution of the exponential kernel with a step function.
+
+        Parameters
+        ----------
+        j: int
+            Gene index j.
+        k: int
+            Gene index k.
+        t1: float
+            Time point t1.
+        t2: float
+            Time point t2.
+
+
+        Returns
+        -------
+        result: float
+            The convolution of the exponential kernel with a step function.
+        """
+
         t_dist = t2 - t1
 
         multiplier = jnp.exp(self.gamma(k) ** 2) / (self.true_d[j] + self.true_d[k])
@@ -323,11 +359,43 @@ class ExactLFM(gpx.base.Module):
     def cross_covariance(
         self, kernel: Kernel, x: Float[Array, "N D"], y: Float[Array, "M D"]
     ) -> Float[Array, "N M"]:
+        """
+        Calculate the cross-covariance between two sets of inputs for a given kernel.
+
+        Parameters
+        ----------
+        kernel : Kernel
+            The kernel function used to calculate the covariance.
+        x : Float[Array, "N D"]
+            The first set of inputs.
+        y : Float[Array, "M D"]
+            The second set of inputs.
+
+        Returns
+        -------
+        Float[Array, "N M"]
+            The cross-covariance between the two sets of inputs.
+        """
         cross_cov = jax.vmap(lambda x: jax.vmap(lambda y: kernel(x, y))(y))(x)
 
         return cross_cov
 
     def gram(self, kernel: Kernel, x: Float[Array, "N D"]) -> LinearOperator:
+        """
+        Calculate the Gram matrix for a given kernel and input data.
+
+        Parameters
+        ----------
+        kernel : Kernel
+            The kernel function used to calculate the covariance.
+        x : Float[Array, "N D"]
+            The input data.
+
+        Returns
+        -------
+        LinearOperator
+            The Gram matrix for the input data.
+        """
         Kxx = self.cross_covariance(kernel, x, x)
 
         return cola.PSD(Dense(Kxx))
@@ -339,6 +407,22 @@ class ExactLFM(gpx.base.Module):
     def latent_predict(
         self, test_inputs: Num[Array, "N D"], train_data: JaxP53Data
     ) -> GaussianDistribution:
+        """
+        Predicts the latent function values at test inputs given the training data.
+
+        Parameters
+        ----------
+        test_inputs : Num[Array, "N D"]
+            A Jax array of test inputs at which the predictive distribution is evaluated.
+        train_data : JAXP53_Data
+            A custom dataclass object that contains the input, output, and the associated uncertainties of the inputs used for the training dataset.
+
+        Returns
+        -------
+        GaussianDistribution
+            A function that accepts an input array and returns the predictive distribution as a `GaussianDistribution`.
+        """
+
         x, y, variances = dataset_3d(train_data)
         t = test_inputs
         # jitter = 1e-3
@@ -368,6 +452,21 @@ class ExactLFM(gpx.base.Module):
     def multi_gene_predict(
         self, test_inputs: Num[Array, "N D"], train_data: JaxP53Data
     ) -> GaussianDistribution:
+        """
+        Predict the gene expression values at test inputs given the training data.
+
+        Parameters
+        ----------
+        test_inputs : Num[Array, "N D"]
+            A Jax array of test inputs at which the predictive distribution is evaluated.
+        train_data : JAXP53_Data
+            A custom dataclass object that contains the input, output, and the associated uncertainties of the inputs used for the training dataset.
+
+        Returns
+        -------
+        GaussianDistribution
+            A function that accepts an input array and returns the predictive distribution as a `GaussianDistribution`.
+        """
         x, y, variances = dataset_3d(train_data)
         t = test_inputs
 
