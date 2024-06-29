@@ -16,6 +16,11 @@ from beartype.typing import Optional
 from plotter import save_plot, clean_legend
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+import beartype.typing as tp
+from gpjax.dataset import Dataset
+
+CustomModel = tp.TypeVar("CustomModel", bound="ExactLFM")
+CustomDataset = tp.TypeVar("CustomDataset", bound="JaxP53Data")
 
 if shutil.which("latex"):
     plt.style.use(
@@ -52,7 +57,7 @@ class GeneExpressionPredictor:
 
     Attributes
     ----------
-    model : Model
+    model : CustomModel
         The model used for gene expression prediction.
     p53_data : P53Data
         The p53 data containing gene expressions.
@@ -64,14 +69,16 @@ class GeneExpressionPredictor:
         Number of testing times.
     """
 
-    def __init__(self, model, p53_data, t=100):
+    def __init__(
+        self, model: CustomModel, p53_data: CustomDataset, t: Optional[int] = 100
+    ):
         self.model = model
         self.p53_data = p53_data
         self.num_genes = p53_data.num_genes
         self.gene_names = p53_data.gene_names
         self.t = t
 
-    def generate_test_times_pred(self):
+    def generate_test_times_pred(self) -> jnp.ndarray:
         """
         Generate testing times for the GP model to predict gene expressions.
 
@@ -90,7 +97,7 @@ class GeneExpressionPredictor:
         )
         return testing_times
 
-    def decompose_predictions(self, pred):
+    def decompose_predictions(self, pred: jnp.ndarray) -> tuple:
         """
         Given a mutli-variate Gaussian distribution mean or standard deviation, decompose the predictions into individual gene expressions (for a variable number of genes).
 
@@ -109,7 +116,7 @@ class GeneExpressionPredictor:
             pred[i * test_size : (i + 1) * test_size] for i in range(self.num_genes)
         )
 
-    def decompose_predictions2(self, pred):
+    def decompose_predictions2(self, pred: jnp.ndarray) -> tuple:
         """
         Given a mutli-variate Gaussian distribution mean or standard deviation, decompose the predictions into individual gene expressions (for all five genes).
 
@@ -134,7 +141,13 @@ class GeneExpressionPredictor:
 
         return gene_1, gene_2, gene_3, gene_4, gene_5
 
-    def plot_predictions(self, p53_data, stddev=2, save=True, save_name=None):
+    def plot_predictions(
+        self,
+        p53_data: CustomDataset,
+        stddev: Optional[int] = 2,
+        save: Optional[bool] = True,
+        save_name: Optional[str] = None,
+    ):
         """
         Plot gene expression predictions (Kxx).
 
@@ -252,7 +265,7 @@ def print_hyperparams(model: CustomModel, dataset: JaxP53Data):
         writer.writerows(data)
 
 
-def generate_test_times(t: Optional[int] = 100):
+def generate_test_times(t: Optional[int] = 100) -> jnp.ndarray:
     """
     Generate testing times for the GP model to predict the latent force function.
 
@@ -274,7 +287,7 @@ def generate_test_times(t: Optional[int] = 100):
     return testing_times
 
 
-def generate_test_times_pred(t: Optional[int] = 100):
+def generate_test_times_pred(t: Optional[int] = 100) -> jnp.ndarray:
     """
     Generate testing times for the GP model to predict gene expressions.
 
