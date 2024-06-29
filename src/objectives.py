@@ -51,7 +51,7 @@ class CustomConjMLL(gpx.objectives.AbstractObjective):
 
         Parameters
         ----------
-        model : ExactLFM
+        model : :class:`model.ExactLFM`
             The model to evaluate the marginal log-likelihood of.
         train_data : Dataset
             The training dataset.

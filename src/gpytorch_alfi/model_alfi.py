@@ -7,7 +7,7 @@ import gpytorch
 import numpy as np
 
 from gpytorch.constraints import Positive, Interval
-from dataset_alfi import PyTorchDataset
+from torch.utils.data import Dataset
 from beartype.typing import Optional
 
 PI = torch.tensor(np.pi, requires_grad=False)
@@ -19,7 +19,7 @@ class ExactLFM(gpytorch.models.ExactGP):
 
     Parameters
     ----------
-    dataset : :class:`dataset.PyTorchDataset`
+    dataset : Dataset
         Dataset containing gene expression data for project
     variance : np.array
         Array of gene expression variances
@@ -38,7 +38,7 @@ class ExactLFM(gpytorch.models.ExactGP):
         Mean function
     """
 
-    def __init__(self, dataset: PyTorchDataset, variance: torch.Tensor):
+    def __init__(self, dataset: Dataset, variance: torch.Tensor):
         train_t, train_y = flatten_dataset(dataset)
         super().__init__(
             train_t, train_y, likelihood=gpytorch.likelihoods.GaussianLikelihood()
@@ -542,7 +542,7 @@ class TorchMean(gpytorch.means.Mean):
         return mean
 
 
-def flatten_dataset(dataset: PyTorchDataset) -> tuple[torch.Tensor, torch.Tensor]:
+def flatten_dataset(dataset: Dataset) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Flattens the given dataset into a format suitable for training.
 

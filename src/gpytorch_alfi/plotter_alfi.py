@@ -13,8 +13,10 @@ import numpy as np
 from matplotlib import rcParams
 from tabulate import tabulate
 from beartype.typing import Optional
-from dataset_alfi import PyTorchDataset
-from trainer_alfi import TorchTrainer
+from torch.utils.data import Dataset
+import beartype.typing as tp
+
+TorchTrainer = tp.TypeVar("TorchTrainer")
 
 if shutil.which("latex"):
     plt.style.use(
@@ -113,7 +115,7 @@ def plot_lf(
 def plot_gxpred(
     gp: gpytorch.distributions.MultivariateNormal,
     timepoints: torch.Tensor,
-    dataset: PyTorchDataset,
+    dataset: Dataset,
     stddev: Optional[int] = 2,
     scatter: Optional[torch.Tensor] = None,
     save: Optional[bool] = True,
@@ -127,7 +129,7 @@ def plot_gxpred(
         Trained GP model.
     timepoints: torch.Tensor
         Timepoints.
-    dataset: :class:`dataset.PyTorchDataset`
+    dataset: Dataset
         Dataset used for training.
     stddev: int, optional
         Number of standard deviations to plot around the mean. Default is 2.
@@ -198,7 +200,7 @@ def plot_gxpred(
 
 def plot_comparison_torch(
     model: gpytorch.models.ExactGP,
-    dataset: PyTorchDataset,
+    dataset: Dataset,
     trainer: TorchTrainer,
     save: Optional[bool] = True,
 ):
@@ -209,9 +211,9 @@ def plot_comparison_torch(
     ----------
     model: gpytorch.models.ExactGP
         Trained model.
-    dataset: :class:`dataset.PyTorchDataset`
+    dataset: Dataset
         Dataset used for training (contains ground truth parameters).
-    trainer: :class:`trainer.TorchTrainer`
+    trainer: :class:`trainer_alfi.TorchTrainer`
         Trainer used for training the model (contains learned parameters).
     save: bool, optional
         Save the plot. Default is True.

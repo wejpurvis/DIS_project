@@ -94,6 +94,24 @@ class ExactLFM(gpx.base.Module):
 
     # Define mean function
     def mean_function(self, x: Num[Array, "N D"]) -> Float[Array, "N O"]:
+        r"""
+        Single Input Motif Model (SIMM) mean function.
+
+        .. math::
+            f(x_{j}) = \frac{B_{j}}{D_{j}}
+
+        From equation 2 in Lawrence et al. (2006), the mean function is defined as the ratio of the basal rate to the degradation rate for the gene expressions, and assumed to be zero for the latent force. This function therefore uses the flag to determine whether the input is a gene expression or latent force function.
+
+        Parameters
+        ----------
+        x : Num[Array, "N D"]
+            Input data.
+
+        Returns
+        -------
+        Float[Array, "N O"]
+            Mean function (0 for latent force, B/D for gene expression)
+        """
         f = jnp.array(x[:, 2:], dtype=int)
 
         block_size = x.shape[0] // self.num_genes
@@ -106,6 +124,29 @@ class ExactLFM(gpx.base.Module):
     def kernel(
         self, t: Float[Array, "1 3"], t_prime: Float[Array, "1 3"]
     ) -> ScalarFloat:
+        """
+        Compute kxx, kxf, or kff between a pair of arrays depending on the flags in the input.
+
+        Parameters
+        ----------
+        t: Array of shape (1, 3)
+            First timepoint input where the first dimension is the time, second is the gene index and the third is the flag.
+
+        t_prime: Array of shape (1, 3)
+            Second timepoint input where the first dimension is the time, second is the gene index and the third is the flag.
+
+        Returns
+        -------
+        final_kernel: float
+            The covariance between the input at times t and t'.
+
+        Notes
+        -----
+        The flag is used to determine if the input is gene expression or latent force.
+        1 = gene expression, 0 = latent force function.
+        GPJAx does not support if statements in kernels, so we use switches to determine the kernel to use.
+        """
+
         # Get flag from input (1 = gene expression, 0 = latent force function)
         f1 = jnp.array(t[2], dtype=int)
         f2 = jnp.array(t_prime[2], dtype=int)
@@ -128,6 +169,28 @@ class ExactLFM(gpx.base.Module):
     def kernel_xx(
         self, t: Float[Array, "1 3"], t_prime: Float[Array, "1 3"]
     ) -> ScalarFloat:
+        r"""
+        Calculates the covariance between the expression leves of genes j and k at times t and t'. Equation 5 in Lawrence et al. (2006):
+
+        .. math::
+            k_{x_{j}x_{k}}(t,t') = S_{j}S_{k}\frac{\sqrt{\pi}l}{2}[h_{kj}(t,t') + h_{kj}(t',t)]
+
+        As GPJax handles 1D inputs, the gene index is passed as an additional dimension in the input to this method.
+
+        Parameters
+        ----------
+        t: Array of shape (1, 3)
+            The input time points for the first gene expression where the first dimension is the time, second is the gene index and the third is the flag. (t, j, 1) where 1 is the flag for training data.
+
+        t_prime: Array of shape (1, 3)
+            The input time points for the second gene expression where the first dimension is the time, second is the gene index and the third is the flag. (t', k, 1) where 1 is the flag for training data.
+
+        Returns
+        -------
+        kxx: float
+            The covariance between the expression levels of genes j and k at times t and t'.
+        """
+
         # Get gene indices
         j = t[1].astype(int)
         k = t_prime[1].astype(int)
@@ -146,6 +209,28 @@ class ExactLFM(gpx.base.Module):
     def kernel_xf(
         self, t: Float[Array, "1 3"], t_prime: Float[Array, "1 3"]
     ) -> ScalarFloat:
+        r"""
+        Cross covariance term required to infer the latent force from gene expression data. Equation 6 in Lawrence et al. (2006):
+
+        .. math::
+            k_{x_{j}f}(t,t') = \frac{S_{rj}\sqrt{\pi}l}{2} \textrm{exp}(\gamma_{j})^{2}\textrm{exp}(-D_{j}(t'-t)) \biggl[ \textrm{erf} \left (\frac{t'-t}{l} - \gamma_{k}\right ) + \textrm{erf} \left (\frac{t}{l} +\gamma_{k} \right ) \biggr]
+
+        This method uses the third flag dimension to determine which input is the gene expression and which is the latent force (as both kxf and it's transpose are used).
+
+        Parameters
+        ----------
+        t: Array of shape (1, 3)
+            The input time points for the gene expression and latent force where the first dimension is the time, second is the gene index and the third is the flag. (t, j, f) where f is the flag.
+
+        t_prime: Array of shape (1, 3)
+            The input time points for the gene expression and latent force where the first dimension is the time, second is the gene index and the third is the flag. (t', j, f) where 0 is the flag.
+
+        Returns
+        -------
+        kxf: float
+            The cross covariance between the expression levels of gene j and the latent force at times t and t'.
+        """
+
         gene_xpr = jnp.where(t[2] == 0, t_prime, t)
         latent_force = jnp.where(t[2] == 0, t, t_prime)
 
@@ -171,6 +256,23 @@ class ExactLFM(gpx.base.Module):
     def kernel_ff(
         self, t: Float[Array, "1 3"], t_prime: Float[Array, "1 3"]
     ) -> ScalarFloat:
+        """
+        Custom RBF kernel taken as the process prior over f(t) (enables analaytical solution for kxf anf kxx).
+
+        Parameters
+        ----------
+        t: Array of shape (1, 3)
+            The input time points for the latent force at time t.
+
+        t_prime: Array of shape (1, 3)
+            The input time points for the latent force at time t'.
+
+        Returns
+        -------
+        K: float
+            The covariance between the latent force at times t and t'.
+        """
+
         t = t[0].reshape(-1)
         t_prime = t_prime[0].reshape(-1)
 

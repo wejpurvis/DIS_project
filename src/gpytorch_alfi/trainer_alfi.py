@@ -5,7 +5,7 @@ This module is adapted from the [Alfi: Approximate Latent Force Inference](https
 import torch
 import gpytorch
 import numpy as np
-from dataset_alfi import PyTorchDataset
+from torch.utils.data import Dataset
 
 from gpytorch.mlls.exact_marginal_log_likelihood import ExactMarginalLogLikelihood
 from beartype.typing import Optional
@@ -22,7 +22,7 @@ class TorchTrainer:
         The model to be trained.
     optimizers : list of torch.optim.Optimizer
         Optimizers used for training the model.
-    dataset : :class:`dataset.PyTorchDataset`
+    dataset : Dataset
         The complete dataset to be used for training, validation, and testing.
     loss_fn : callable
         A loss function that takes model outputs and targets and returns a loss.
@@ -49,7 +49,7 @@ class TorchTrainer:
         self,
         model: gpytorch.models.ExactGP,
         optimizers: torch.optim.Optimizer,
-        dataset: PyTorchDataset,
+        dataset: Dataset,
         loss_fn: ExactMarginalLogLikelihood,
         batch_size: Optional[int] = 1,
         valid_size: Optional[float] = 0.0,
