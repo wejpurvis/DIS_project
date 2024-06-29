@@ -1,7 +1,22 @@
-# DIS Project
+<!-- omit in toc -->
+# Modelling Transcriptional Regulation using Gaussian Processes
 
-This repository is for DIS project 12: Gaussian Processes for Latent force Models.
+**Author:** William Purvis
 
+<!-- omit in toc -->
+## Table of Contents
+- [Project description](#project-description)
+- [How to install \& run the project](#how-to-install--run-the-project)
+  - [Installing and running in Docker](#installing-and-running-in-docker)
+  - [Running locally](#running-locally)
+- [How to use the project](#how-to-use-the-project)
+  - [Documentation](#documentation)
+- [License](#license)
+  - [A note on the use of generation tools](#a-note-on-the-use-of-generation-tools)
+
+## Project description
+
+This project implements a custom *latent force model* in `GPJax`, a didactic Gaussian Process library for python, to infer the latent activity profile of the p53 transcription factor given the expressions of its target genes. The model is flexible, allowing for different data replicas to be used as well as enabling ablation studies.
 
 ## How to install & run the project
 
@@ -12,8 +27,6 @@ git clone git@gitlab.developers.cam.ac.uk:phy/data-intensive-science-mphil/proje
 ```
 
 ### Installing and running in Docker
-
-TODO: add more info about docker and pasting images
 
 A dockerfile is provided to run the project alongside all of it's dependencies (defined in environment.yml) in a docker container. To build the docker image from the provided dockerfile run the following commands after cloning the repository:
 
@@ -27,7 +40,7 @@ As the project requires command-line interactions, the docker container needs to
 docker run -it lfm_image
 ```
 
-The project can then be ran within the docker container.
+The project can then be run within the docker container.
 
 ### Running locally
 
@@ -40,12 +53,28 @@ conda activate gpjax_wp289          # activate env
 
 ## How to use the project
 
-TODO
+To run the `GPJax` implementation of the latent force model (LFM) used to obtain the latent activity of p53 presented in the report run the following command from the root directory:
 
+```bash
+python src/main.py
+```
+
+In addition, refactored code from the [ALFI](https://github.com/mossjacob/alfi) package is included to validate the results. This LFM can be run using:
+
+```bash
+python src/gpytorch/main_alfi.py
+```
+
+Additionally, example notebooks are provided as tutorials on how to use this package (`src/notebook.py`).
 
 ### Documentation
 
-TODO: discuss building documentation (seperate gpjax and gpytorch)
+This project uses NumPy-style doc strings and in-depth documentation on how to use the package can be obtained by navigating to the `docs/` directory and building the documentation locally:
+
+```bash
+cd docs
+make html # Generate HTML documentation
+```
 
 ## License
 
@@ -54,4 +83,8 @@ file for details.
 
 ### A note on the use of generation tools
 
-TODO
+GitHub copilot was used throughout the project as it is installed on my IDE (VS code). It's use was limited to auto-completing lines of code where it made sense to do so (i.e, it was not used to blindly implement functionality, simply to complete code and/or docstring sentences). The use of GenAI chatbots such as ChatGPT and PerplexityAI was minimised throughout the development of the codebase and examples of some prompts used are shown below:
+
+- "Explain why I am getting a tracer error in JAX here"
+- "Generate NumPy style docs for this function"
+- "How can I use tabulate to format my results nicely on the CL?"
