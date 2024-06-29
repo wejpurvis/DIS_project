@@ -14,7 +14,7 @@ data/
 src/**/*.ipynb
 
 # Ignore 'sandbox' work
-latent_forces/
+sandbox/
 
 # Ignore documentation build
 docs/build/
