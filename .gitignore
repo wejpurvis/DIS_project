@@ -19,3 +19,7 @@ sandbox/
 # Ignore documentation build
 docs/build/
 docs/.DS_Store
+
+# Ignore plots in src (apart from ablation) as they are included in the report/
+src/plots/*.png
+!src/plots/ablation/*.png
