@@ -2,7 +2,7 @@
 **/__pycache__/
 
 # Don't upload data
-data/
+data/*.csv
 
 # Ignore all .npy files
 **/*.npy
