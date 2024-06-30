@@ -18,6 +18,11 @@ from model import ExactLFM
 from objectives import CustomConjMLL
 from trainer import JaxTrainer
 from utils import GeneExpressionPredictor, print_hyperparams, generate_test_times
+import warnings
+
+warnings.filterwarnings(
+    "ignore", message="torch.utils._pytree._register_pytree_node is deprecated"
+)
 
 key = jax.random.PRNGKey(42)
 
