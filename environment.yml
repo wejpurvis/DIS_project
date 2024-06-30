@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - pip
   - appnope=0.1.4
   - asttokens=2.4.1
   - bzip2=1.0.8
