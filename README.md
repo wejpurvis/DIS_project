@@ -67,6 +67,12 @@ python src/gpytorch/main_alfi.py
 
 Additionally, example notebooks are provided as tutorials on how to use this package (`src/notebook.py`).
 
+**NOTE** there is a depency issue with GPJax, and the following warning may appear (that can be safely ignored):
+
+```bash
+UserWarning: torch.utils._pytree._register_pytree_node is deprecated. Please use torch.utils._pytree.register_pytree_node instead.
+```
+
 ### Documentation
 
 This project uses NumPy-style doc strings and in-depth documentation on how to use the package can be obtained by navigating to the `docs/` directory and building the documentation locally:
