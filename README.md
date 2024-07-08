@@ -12,7 +12,6 @@
 - [How to use the project](#how-to-use-the-project)
   - [Documentation](#documentation)
 - [License](#license)
-  - [A note on the use of generation tools](#a-note-on-the-use-of-generation-tools)
 
 ## Project description
 
@@ -86,11 +85,3 @@ make html # Generate HTML documentation
 
 This project is licensed under the MIT license - see the [LICENSE](license.txt)
 file for details.
-
-### A note on the use of generation tools
-
-GitHub copilot was used throughout the project as it is installed on my IDE (VS code). It's use was limited to auto-completing lines of code where it made sense to do so (i.e, it was not used to blindly implement functionality, simply to complete code and/or docstring sentences). The use of GenAI chatbots such as ChatGPT and PerplexityAI was minimised throughout the development of the codebase and examples of some prompts used are shown below:
-
-- "Explain why I am getting a tracer error in JAX here"
-- "Generate NumPy style docs for this function"
-- "How can I use tabulate to format my results nicely on the CL?"
