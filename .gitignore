@@ -25,3 +25,6 @@ src/plots/*.png
 !src/plots/gpjax_lf_replicate2.png
 !src/plots/gpjax_lf_replicate3.png
 !src/plots/ablation/*.png
+
+# Ignore report for github
+report/
